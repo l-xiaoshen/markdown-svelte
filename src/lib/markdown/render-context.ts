@@ -1,11 +1,17 @@
-import { getContext, setContext } from 'svelte'
+import { getContext, setContext, type Component } from 'svelte'
 import type { DocumentAnchors } from './document-anchors'
+import type { NodeProps } from './node-props'
+import type { ParsedMarkdownNode } from './renderable-node'
 
 const renderContextKey = Symbol('markdown-svelte-render-context')
+
+export type MarkdownNodeRenderer = Component<NodeProps<ParsedMarkdownNode>>
 
 export interface MarkdownRenderContext {
 	readonly anchors: DocumentAnchors
 	readonly baseUrl: string | undefined
+	readonly nodeRenderer?: MarkdownNodeRenderer
+	readonly animate?: boolean
 }
 
 export function provideRenderContext(context: MarkdownRenderContext): void {

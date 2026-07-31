@@ -188,6 +188,22 @@ code {
 		width: min(100% - 2rem, 72rem);
 	}
 
+	.site-header-inner {
+		gap: 1rem;
+	}
+
+	.site-brand {
+		font-size: 0.9rem;
+	}
+
+	.site-nav {
+		gap: 0.65rem;
+	}
+
+	.site-nav a {
+		font-size: 0.8rem;
+	}
+
 	.site-main {
 		padding-top: 2.5rem;
 	}

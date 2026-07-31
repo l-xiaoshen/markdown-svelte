@@ -23,6 +23,47 @@ npm install markdown-svelte
 <MarkdownViewer markdown={source} />
 ```
 
+## Streaming parsed nodes
+
+Use the dedicated `markdown-svelte/stream` entrypoint when parsing happens in a worker, an SSE
+consumer, or another part of the application. The component accepts the latest parsed node array and
+does not parse Markdown itself:
+
+```sh
+npm install stream-markdown-parser
+```
+
+```svelte
+<script lang="ts">
+	import MarkdownStream, { type ParsedMarkdownNode } from 'markdown-svelte/stream'
+	import { getMarkdown, parseMarkdownToStructure } from 'stream-markdown-parser'
+
+	const parser = getMarkdown('answer')
+	let source = ''
+	let nodes = $state<ParsedMarkdownNode[]>([])
+
+	function append(chunk: string, final = false) {
+		source += chunk
+		nodes = parseMarkdownToStructure(source, parser, { final })
+	}
+</script>
+
+<MarkdownStream {nodes} />
+```
+
+Replace the `nodes` array whenever parser output changes. The renderer keys sibling positions so
+completed components stay mounted while an append-only stream grows, even when the parser returns
+fresh node objects. Text and inline-code additions fade in by default; other node renderers are shared
+with `MarkdownViewer`.
+
+```svelte
+<MarkdownStream {nodes} animate={false} baseUrl="https://docs.example.com/" idPrefix="answer" />
+```
+
+Animation respects `prefers-reduced-motion`. Its timing can be customized with
+`--markdown-stream-fade-duration` and `--markdown-stream-fade-easing`. Positional identity is intended
+for append-oriented parser output; remount the component when switching it to a different document.
+
 Resolve relative links and images against a document URL and scope generated IDs when several
 documents share a page:
 
@@ -166,16 +207,21 @@ The package mirrors the ownership boundaries of the reference implementation:
 ```text
 src/lib/markdown/
   markdown-viewer.svelte    public component and document orchestration
+  markdown-renderer.svelte  shared parsed-node document shell
   parser.ts                 parser configuration
   node-list.svelte          recursive list renderer
   node.svelte               node-type dispatcher
   document-anchors.ts       heading and footnote identity
   paragraph-segments.ts     valid paragraph/block boundaries
   nodes/                    one Svelte renderer per node type
+src/lib/stream/
+  markdown-stream.svelte    parsed-node streaming entrypoint
+  node.svelte               stream-aware node dispatcher
+  nodes/                    append-animation renderers
 ```
 
-Implementation-only modules are not re-exported. The package root exposes only the component, parser,
-and public types.
+Implementation-only modules are not re-exported. The package root exposes the static component,
+parser, and public types; `markdown-svelte/stream` exposes the parsed-node streaming component.
 
 ## Development
 

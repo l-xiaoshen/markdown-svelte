@@ -35,6 +35,10 @@
 		".": {
 			"types": "./dist/index.d.ts",
 			"svelte": "./dist/index.js"
+		},
+		"./stream": {
+			"types": "./dist/stream/index.d.ts",
+			"svelte": "./dist/stream/index.js"
 		}
 	},
 	"peerDependencies": {

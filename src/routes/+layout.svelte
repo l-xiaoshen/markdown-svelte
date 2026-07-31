@@ -15,6 +15,7 @@
 			<nav class="site-nav" aria-label="Main navigation">
 				<a href="/">API</a>
 				<a href="/examples">Examples</a>
+				<a href="/stream">Stream</a>
 			</nav>
 		</div>
 	</header>
