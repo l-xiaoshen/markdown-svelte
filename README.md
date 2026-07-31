@@ -1,65 +1,205 @@
-# Svelte library
+# markdown-svelte
 
-Everything you need to build a Svelte library, powered by [`sv`](https://npmjs.com/package/sv).
+A typed Markdown renderer for Svelte 5. Markdown is parsed into structured nodes and rendered by
+owned Svelte components rather than one generated HTML string.
 
-Read more about creating a library [in the docs](https://svelte.dev/docs/kit/packaging).
-
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
+## Install
 
 ```sh
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
+npm install markdown-svelte
 ```
 
-To recreate this project with the same configuration:
+`svelte >= 5.16` is a peer dependency. `stream-markdown-parser` is included as a runtime dependency.
+
+## Use
+
+```svelte
+<script lang="ts">
+	import { MarkdownViewer } from 'markdown-svelte'
+
+	let source = $state('# Hello, **Svelte**!')
+</script>
+
+<MarkdownViewer markdown={source} />
+```
+
+Resolve relative links and images against a document URL and scope generated IDs when several
+documents share a page:
+
+```svelte
+<MarkdownViewer
+	markdown={source}
+	baseUrl="https://docs.example.com/guides/getting-started/"
+	idPrefix="getting-started"
+/>
+```
+
+## Component API
+
+`MarkdownViewer` renders an `<article>` and accepts standard article attributes.
+
+| Prop       | Type                | Default     | Purpose                                                  |
+| ---------- | ------------------- | ----------- | -------------------------------------------------------- |
+| `markdown` | `string`            | required    | Markdown source                                          |
+| `baseUrl`  | `string \| URL`     | `undefined` | Resolve relative links and images against an HTTP(S) URL |
+| `idPrefix` | `string`            | `undefined` | Namespace heading, footnote, and local fragment IDs      |
+| `class`    | Svelte `ClassValue` | `undefined` | Add classes to the rendered article                      |
+
+```svelte
+<MarkdownViewer markdown={source} class={['document', { compact }]} aria-label="Rendered documentation" />
+```
+
+The root export also includes `MarkdownViewerProps`, `ParsedMarkdownNode`, and the parser:
+
+```ts
+import { parseMarkdown, type ParsedMarkdownNode } from 'markdown-svelte'
+
+const nodes: ParsedMarkdownNode[] = parseMarkdown('# API')
+```
+
+## Syntax
+
+The parser supports:
+
+- Headings, paragraphs, blockquotes, lists, links, images, thematic breaks, and code blocks
+- Tables, task lists, footnotes, and fenced containers such as `::: tip`
+- Strikethrough, highlights, insertions, subscripts, and superscripts
+- Inline and block math source
+- Sanitized raw HTML
+- Linkification, typographic punctuation, and Markdown line breaks
+- Split rendering for parser-provided diff blocks
+
+Math is displayed as source. The package does not bundle a math typesetter or syntax highlighter.
+
+## Styling
+
+No Tailwind configuration or global stylesheet is required. Every node renderer owns its markup and
+styles. Theme values are inherited through CSS custom properties set on the component or an ancestor:
+
+```css
+.product-docs {
+	--markdown-color-text: #172033;
+	--markdown-color-muted: #64748b;
+	--markdown-color-border: #d7dde7;
+	--markdown-color-surface: #f5f7fa;
+	--markdown-color-surface-strong: #e9edf3;
+	--markdown-color-link: #075985;
+	--markdown-color-accent: #a63a25;
+	--markdown-color-code: #e8edf5;
+	--markdown-code-background: #111827;
+	--markdown-code-text: #e5edf8;
+	--markdown-radius: 0.55rem;
+	--markdown-font-sans: system-ui, sans-serif;
+	--markdown-font-mono: ui-monospace, monospace;
+}
+```
+
+```svelte
+<MarkdownViewer markdown={source} class="product-docs" />
+```
+
+The default palette is neutral and light. Set the variables explicitly when the surrounding surface
+is dark.
+
+Every rendered node also has a stable `markdown-svelte-*` class. Built-in component rules use
+zero-specificity `:where(...)` selectors, so normal consumer selectors override them without
+`!important`:
+
+```css
+.product-docs .markdown-svelte-heading--2 {
+	margin-top: 3rem;
+	border-bottom: 0;
+	font-family: Georgia, serif;
+}
+
+.product-docs .markdown-svelte-paragraph {
+	max-width: 68ch;
+	font-size: 1.05rem;
+}
+
+.product-docs .markdown-svelte-link {
+	color: #be123c;
+	text-decoration-style: wavy;
+}
+
+.product-docs .markdown-svelte-code-block {
+	border-radius: 0;
+	box-shadow: none;
+}
+```
+
+Primary style hooks:
+
+| Area           | Classes                                                                                                                                  |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Document       | `markdown-svelte`                                                                                                                        |
+| Typography     | `markdown-svelte-heading`, `markdown-svelte-heading--1` through `--6`, `markdown-svelte-paragraph`                                       |
+| Inline         | `markdown-svelte-link`, `markdown-svelte-inline-code`, `markdown-svelte-strong`, `markdown-svelte-emphasis`, `markdown-svelte-highlight` |
+| Lists          | `markdown-svelte-list`, `markdown-svelte-list--ordered`, `markdown-svelte-list-item`, `markdown-svelte-checkbox`                         |
+| Blocks         | `markdown-svelte-blockquote`, `markdown-svelte-admonition`, `markdown-svelte-container`                                                  |
+| Code           | `markdown-svelte-code-block`, `markdown-svelte-code-header`, `markdown-svelte-code-pre`, `markdown-svelte-code-copy`                     |
+| Tables         | `markdown-svelte-table-wrapper`, `markdown-svelte-table`, `markdown-svelte-table-row`, `markdown-svelte-table-cell`                      |
+| Footnotes      | `markdown-svelte-footnote`, `markdown-svelte-footnote-reference`, `markdown-svelte-footnote-backlink`                                    |
+| Media and HTML | `markdown-svelte-image`, `markdown-svelte-html-block`, `markdown-svelte-html-inline`                                                     |
+
+Inside a Svelte component's scoped `<style>`, wrap selectors with `:global(...)` when targeting the
+renderer's descendants.
+
+## Security
+
+Normal Markdown text and code are rendered through Svelte interpolation. Raw HTML is passed through
+`stream-markdown-parser`'s safe sanitizer before `{@html}` is used. Scripts, embedded content, event
+handlers, styles, dangerous attributes, and active URL schemes are removed or rejected.
+
+Markdown links allow HTTP, HTTPS, email, telephone, fragment, root-relative, and relative URLs.
+Images use the parser's stricter image policy, which excludes active schemes and SVG data URLs.
+Protocol-relative URLs are rejected. External HTTP links open in a new tab with
+`rel="noopener noreferrer"`.
+
+Sanitization is not a replacement for application-level controls. For high-risk content, also use a
+Content Security Policy and resource limits.
+
+## Organization
+
+The package mirrors the ownership boundaries of the reference implementation:
+
+```text
+src/lib/markdown/
+  markdown-viewer.svelte    public component and document orchestration
+  parser.ts                 parser configuration
+  node-list.svelte          recursive list renderer
+  node.svelte               node-type dispatcher
+  document-anchors.ts       heading and footnote identity
+  paragraph-segments.ts     valid paragraph/block boundaries
+  nodes/                    one Svelte renderer per node type
+```
+
+Implementation-only modules are not re-exported. The package root exposes only the component, parser,
+and public types.
+
+## Development
+
+This repository follows the [SvelteKit packaging guide](https://svelte.dev/docs/kit/packaging):
+
+- `src/lib` is the package source.
+- `src/routes` is the local documentation and playground app.
+- `svelte-package` generates `dist` and type declarations.
+- `publint` validates the packed result.
 
 ```sh
-# recreate this project
-bun x sv@0.16.6 create --template library --types ts --add prettier --install bun ./
+bun install
+bun run dev
+bun run test
+bun run check
+bun run prepack
 ```
 
-## Developing
+Development pages:
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+- `/` contains the package overview and live output.
+- `/playground` provides an editor and AST inspection.
+- `/examples` demonstrates syntax, sanitization, ID scoping, and relative URL resolution.
 
-```sh
-npm run dev
+## License
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-Everything inside `src/lib` is part of your library, everything inside `src/routes` can be used as a showcase or preview app.
-
-## Building
-
-To build your library:
-
-```sh
-npm pack
-```
-
-To create a production version of your showcase app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
-
-## Publishing
-
-Go into the `package.json` and give your package the desired name through the `"name"` option. Also consider adding a `"license"` field and point it to a `LICENSE` file which you can create from a template (one popular option is the [MIT license](https://opensource.org/license/mit/)).
-
-To publish your library to [npm](https://www.npmjs.com):
-
-```sh
-npm publish
-```
+MIT
