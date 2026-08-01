@@ -121,10 +121,10 @@
 		cursor
 		const frame = requestAnimationFrame(() => {
 			if (sourceViewport) {
-				sourceViewport.scrollTop = sourceViewport.scrollHeight
+				sourceViewport.scrollTo({ top: sourceViewport.scrollHeight, behavior: 'smooth' })
 			}
 			if (outputViewport) {
-				outputViewport.scrollTop = outputViewport.scrollHeight
+				outputViewport.scrollTo({ top: outputViewport.scrollHeight, behavior: 'smooth' })
 			}
 		})
 
