@@ -4,13 +4,17 @@
 	import { safeHtml } from '../html-policy'
 	import InlineNodeList from '../inline-node-list.svelte'
 	import type { NodeProps } from '../node-props'
+	import { useRenderContext } from '../render-context'
 
 	let { node, insideLink = false }: NodeProps<ParserHtmlInlineNode> = $props()
+	const context = useRenderContext()
 	let isAnchor = $derived(node.tag?.toLowerCase() === 'a' || /^<\s*a\b/i.test(node.content))
 	let isBlock = $derived(isBlockHtmlTag(node.tag))
 </script>
 
-{#if insideLink && isAnchor}
+{#if !context.allowRawHtml}
+	<span class="markdown-svelte-html-escaped">{node.raw}</span>
+{:else if insideLink && isAnchor}
 	<InlineNodeList nodes={node.children} {insideLink} />
 {:else if canRenderHtmlTagAtRoot(node.tag)}
 	{#if isBlock}

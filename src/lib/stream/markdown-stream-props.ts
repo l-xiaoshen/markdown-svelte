@@ -6,6 +6,8 @@ export interface MarkdownStreamProps extends Omit<HTMLAttributes<HTMLElement>, '
 	nodes: readonly ParsedMarkdownNode[]
 	/** Animate append-only text and structural size changes. */
 	animate?: boolean
+	/** Render sanitized raw HTML from the parsed nodes. */
+	allowRawHtml?: boolean
 	baseUrl?: string | URL
 	idPrefix?: string
 }

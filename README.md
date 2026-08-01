@@ -87,12 +87,13 @@ documents share a page:
 
 `MarkdownViewer` renders an `<article>` and accepts standard article attributes.
 
-| Prop       | Type                | Default     | Purpose                                                  |
-| ---------- | ------------------- | ----------- | -------------------------------------------------------- |
-| `markdown` | `string`            | required    | Markdown source                                          |
-| `baseUrl`  | `string \| URL`     | `undefined` | Resolve relative links and images against an HTTP(S) URL |
-| `idPrefix` | `string`            | `undefined` | Namespace heading, footnote, and local fragment IDs      |
-| `class`    | Svelte `ClassValue` | `undefined` | Add classes to the rendered article                      |
+| Prop           | Type                | Default     | Purpose                                                  |
+| -------------- | ------------------- | ----------- | -------------------------------------------------------- |
+| `markdown`     | `string`            | required    | Markdown source                                          |
+| `allowRawHtml` | `boolean`           | `false`     | Render sanitized raw HTML                                |
+| `baseUrl`      | `string \| URL`     | `undefined` | Resolve relative links and images against an HTTP(S) URL |
+| `idPrefix`     | `string`            | `undefined` | Namespace heading, footnote, and local fragment IDs      |
+| `class`        | Svelte `ClassValue` | `undefined` | Add classes to the rendered article                      |
 
 ```svelte
 <MarkdownViewer markdown={source} class={['document', { compact }]} aria-label="Rendered documentation" />
@@ -114,7 +115,7 @@ The parser supports:
 - Tables, task lists, footnotes, and fenced containers such as `::: tip`
 - Strikethrough, highlights, insertions, subscripts, and superscripts
 - Inline and block math source
-- Sanitized raw HTML
+- Optional sanitized raw HTML
 - Linkification, typographic punctuation, and Markdown line breaks
 - Split rendering for parser-provided diff blocks
 
@@ -196,9 +197,18 @@ renderer's descendants.
 
 ## Security
 
-Normal Markdown text and code are rendered through Svelte interpolation. Raw HTML is passed through
-`stream-markdown-parser`'s safe sanitizer before `{@html}` is used. Scripts, embedded content, event
-handlers, styles, dangerous attributes, and active URL schemes are removed or rejected.
+Normal Markdown text and code are rendered through Svelte interpolation. Raw HTML rendering is
+disabled by default and its source is displayed as escaped text. Enable it explicitly for either
+renderer with `allowRawHtml`:
+
+```svelte
+<MarkdownViewer markdown={source} allowRawHtml />
+<MarkdownStream {nodes} allowRawHtml />
+```
+
+When enabled, raw HTML is passed through `stream-markdown-parser`'s safe sanitizer before `{@html}`
+is used. Scripts, embedded content, event handlers, styles, dangerous attributes, and active URL
+schemes are removed or rejected.
 
 Markdown links allow HTTP, HTTPS, email, telephone, fragment, root-relative, and relative URLs.
 Images use the parser's stricter image policy, which excludes active schemes and SVG data URLs.

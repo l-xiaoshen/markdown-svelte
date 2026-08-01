@@ -27,11 +27,27 @@ describe('MarkdownViewer', () => {
 		expect(body).toContain('Back to footnote reference 1')
 	})
 
+	it('escapes raw HTML by default', () => {
+		const body = withoutSvelteMarkers(
+			render(MarkdownViewer, {
+				props: {
+					markdown: '<div>block</div>\n\nbefore <strong>inline</strong> after'
+				}
+			}).body
+		)
+
+		expect(body).toContain('&lt;div>block&lt;/div>')
+		expect(body).toContain('&lt;strong>inline&lt;/strong>')
+		expect(body).not.toContain('<div>block</div>')
+		expect(body).not.toContain('<strong>inline</strong>')
+	})
+
 	it('keeps block HTML out of phrasing elements', () => {
 		const body = withoutSvelteMarkers(
 			render(MarkdownViewer, {
 				props: {
-					markdown: 'before <h2>title</h2> after\n\n# before <div>box</div> after\n\nbefore <li>item</li> after'
+					markdown: 'before <h2>title</h2> after\n\n# before <div>box</div> after\n\nbefore <li>item</li> after',
+					allowRawHtml: true
 				}
 			}).body
 		)

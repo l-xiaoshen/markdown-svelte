@@ -18,6 +18,20 @@ describe('MarkdownStream', () => {
 		expect(settled).not.toContain('markdown-svelte-stream-delta')
 	})
 
+	it('requires raw HTML rendering to be explicitly enabled', () => {
+		const nodes = parseMarkdown('<div>block</div>\n\nbefore <strong>inline</strong> after')
+		const escaped = render(MarkdownStream, { props: { nodes, animate: false } }).body
+		const rendered = render(MarkdownStream, {
+			props: { nodes, animate: false, allowRawHtml: true }
+		}).body
+
+		expect(escaped).toContain('&lt;div>block&lt;/div>')
+		expect(escaped).toContain('&lt;strong>inline&lt;/strong>')
+		expect(escaped).not.toContain('<div>block</div>')
+		expect(rendered).toContain('<div>block</div>')
+		expect(rendered).toContain('<strong>inline</strong>')
+	})
+
 	it('only separates append-only text updates', () => {
 		expect(resolveStreamingText('streaming', 'stream', true)).toEqual({ type: 'append', content: 'ing' })
 		expect(resolveStreamingText('replacement', 'stream', true)).toEqual({

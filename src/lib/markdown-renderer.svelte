@@ -7,6 +7,7 @@
 
 	interface MarkdownRendererProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
 		nodes: readonly ParsedMarkdownNode[]
+		allowRawHtml?: boolean
 		baseUrl?: string | URL
 		idPrefix?: string
 		nodeRenderer?: MarkdownNodeRenderer
@@ -16,6 +17,7 @@
 
 	let {
 		nodes,
+		allowRawHtml = false,
 		baseUrl,
 		idPrefix,
 		nodeRenderer,
@@ -25,11 +27,14 @@
 		...attributes
 	}: MarkdownRendererProps = $props()
 
-	let anchors = $derived(createDocumentAnchors(nodes, idPrefix))
+	let anchors = $derived(createDocumentAnchors(nodes, idPrefix, allowRawHtml))
 
 	provideRenderContext({
 		get anchors() {
 			return anchors
+		},
+		get allowRawHtml() {
+			return allowRawHtml
 		},
 		get baseUrl() {
 			return baseUrl?.toString()

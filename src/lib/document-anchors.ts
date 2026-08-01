@@ -11,7 +11,11 @@ export interface DocumentAnchors {
 	fragments: ReadonlyMap<string, string>
 }
 
-export function createDocumentAnchors(nodes: readonly ParsedMarkdownNode[], idPrefix?: string): DocumentAnchors {
+export function createDocumentAnchors(
+	nodes: readonly ParsedMarkdownNode[],
+	idPrefix?: string,
+	allowRawHtml = false
+): DocumentAnchors {
 	const headings: HeadingNode[] = []
 	const footnotes: FootnoteNode[] = []
 	const references: FootnoteReferenceNode[] = []
@@ -27,7 +31,7 @@ export function createDocumentAnchors(nodes: readonly ParsedMarkdownNode[], idPr
 			references.push(node)
 		} else if (isNodeType(node, 'footnote_anchor')) {
 			backlinks.push(node)
-		} else if (isNodeType(node, 'html_block') || isNodeType(node, 'html_inline')) {
+		} else if (allowRawHtml && (isNodeType(node, 'html_block') || isNodeType(node, 'html_inline'))) {
 			for (const id of extractHtmlIds(node.content)) {
 				rawHtmlIds.add(id)
 			}

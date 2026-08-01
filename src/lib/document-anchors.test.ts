@@ -25,6 +25,16 @@ describe('document anchors', () => {
 		expect(headingAnchorBase('***')).toBe('section')
 	})
 
+	it('only reserves raw HTML IDs when raw HTML is enabled', () => {
+		const nodes = parseMarkdown('<div id="section">Raw</div>\n\n# Section')
+		const heading = nodes.find((node) => isNodeType(node, 'heading'))
+
+		expect(heading ? createDocumentAnchors(nodes).headingIds.get(heading) : undefined).toBe('section')
+		expect(heading ? createDocumentAnchors(nodes, undefined, true).headingIds.get(heading) : undefined).toBe(
+			'section-1'
+		)
+	})
+
 	it('allocates distinct heading, footnote, and repeated reference IDs', () => {
 		const nodes = parseMarkdown('# Footnote x\n\nFirst[^x] and second[^x].\n\n[^x]: Shared note.')
 		const anchors = createDocumentAnchors(nodes, 'doc')

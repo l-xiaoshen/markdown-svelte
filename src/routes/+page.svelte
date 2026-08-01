@@ -56,6 +56,12 @@ const nodes: ParsedMarkdownNode[] = parseMarkdown('# API')`
 			type: 'string',
 			defaultValue: 'undefined',
 			description: 'Namespaces heading, footnote, and local fragment IDs.'
+		},
+		{
+			name: 'allowRawHtml',
+			type: 'boolean',
+			defaultValue: 'false',
+			description: 'Renders sanitized raw HTML when explicitly enabled.'
 		}
 	]
 </script>
@@ -145,7 +151,8 @@ const nodes: ParsedMarkdownNode[] = parseMarkdown('# API')`
 	<h2>Rendering and safety</h2>
 	<ul>
 		<li>Text and code are rendered through Svelte interpolation.</li>
-		<li>Raw HTML is passed through the parser's safe sanitizer before rendering.</li>
+		<li>Raw HTML is escaped by default and must be enabled with <code>allowRawHtml</code>.</li>
+		<li>Enabled raw HTML is passed through the parser's safe sanitizer before rendering.</li>
 		<li>Active URL schemes and protocol-relative URLs are rejected.</li>
 		<li>External HTTP links receive <code>rel="noopener noreferrer"</code>.</li>
 		<li>Math source is displayed without bundling a math typesetter.</li>

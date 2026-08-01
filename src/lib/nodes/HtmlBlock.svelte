@@ -3,11 +3,13 @@
 	import { canRenderHtmlTagAtRoot } from '../html-elements'
 	import { safeHtml } from '../html-policy'
 	import type { NodeProps } from '../node-props'
+	import { useRenderContext } from '../render-context'
 
 	let { node }: NodeProps<ParserHtmlBlockNode> = $props()
+	const context = useRenderContext()
 </script>
 
-{#if canRenderHtmlTagAtRoot(node.tag)}
+{#if context.allowRawHtml && canRenderHtmlTagAtRoot(node.tag)}
 	<div class="markdown-svelte-html-block">{@html safeHtml(node.content)}</div>
 {:else}
 	<span class="markdown-svelte-html-escaped">{node.raw}</span>

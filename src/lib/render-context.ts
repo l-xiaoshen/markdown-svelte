@@ -9,6 +9,7 @@ export type MarkdownNodeRenderer = Component<NodeProps<ParsedMarkdownNode>>
 
 export interface MarkdownRenderContext {
 	readonly anchors: DocumentAnchors
+	readonly allowRawHtml: boolean
 	readonly baseUrl: string | undefined
 	readonly nodeRenderer?: MarkdownNodeRenderer
 	readonly animate?: boolean

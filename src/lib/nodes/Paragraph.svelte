@@ -4,8 +4,10 @@
 	import NodeList from '../node-list.svelte'
 	import type { NodeProps } from '../node-props'
 	import { paragraphSegments } from '../paragraph-segments'
+	import { useRenderContext } from '../render-context'
 
 	let { node }: NodeProps<ParserParagraphNode> = $props()
+	const context = useRenderContext()
 	let segments = $derived(paragraphSegments(node))
 </script>
 
@@ -14,7 +16,7 @@
 		<p class="markdown-svelte-paragraph"><NodeList nodes={segment.nodes} /></p>
 	{:else if segment.kind === 'block'}
 		<NodeList nodes={[segment.node]} />
-	{:else if segment.canRender}
+	{:else if context.allowRawHtml && segment.canRender}
 		<div class="markdown-svelte-html-block">{@html safeHtml(segment.source)}</div>
 	{:else}
 		<p class="markdown-svelte-paragraph">{segment.source}</p>
