@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { TextNode as ParserTextNode } from 'stream-markdown-parser'
-	import type { NodeProps } from '../../markdown/node-props'
-	import { useRenderContext } from '../../markdown/render-context'
+	import type { NodeProps } from '../../node-props'
+	import { useRenderContext } from '../../render-context'
 	import { StreamingText } from '../streaming-text.svelte'
 	import Delta from './Delta.svelte'
 

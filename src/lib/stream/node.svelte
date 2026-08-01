@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Node from '../markdown/node.svelte'
-	import type { NodeProps } from '../markdown/node-props'
-	import { useRenderContext } from '../markdown/render-context'
-	import { isNodeType, type ParsedMarkdownNode } from '../markdown/renderable-node'
+	import Node from '../node.svelte'
+	import type { NodeProps } from '../node-props'
+	import { useRenderContext } from '../render-context'
+	import { isNodeType, type ParsedMarkdownNode } from '../renderable-node'
 	import InlineCode from './nodes/InlineCode.svelte'
 	import Text from './nodes/Text.svelte'
 

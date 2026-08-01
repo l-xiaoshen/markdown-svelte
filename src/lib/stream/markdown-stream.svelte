@@ -1,5 +1,5 @@
 <script lang="ts">
-	import MarkdownRenderer from '../markdown/markdown-renderer.svelte'
+	import MarkdownRenderer from '../markdown-renderer.svelte'
 	import type { MarkdownStreamProps } from './markdown-stream-props'
 	import StreamNode from './node.svelte'
 

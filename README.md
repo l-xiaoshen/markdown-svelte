@@ -205,7 +205,8 @@ Content Security Policy and resource limits.
 The package mirrors the ownership boundaries of the reference implementation:
 
 ```text
-src/lib/markdown/
+src/lib/
+  index.ts                  markdown-svelte entrypoint
   markdown-viewer.svelte    public component and document orchestration
   markdown-renderer.svelte  shared parsed-node document shell
   parser.ts                 parser configuration
@@ -214,14 +215,16 @@ src/lib/markdown/
   document-anchors.ts       heading and footnote identity
   paragraph-segments.ts     valid paragraph/block boundaries
   nodes/                    one Svelte renderer per node type
-src/lib/stream/
-  markdown-stream.svelte    parsed-node streaming entrypoint
-  node.svelte               stream-aware node dispatcher
-  nodes/                    append-animation renderers
+  stream/
+    index.ts                markdown-svelte/stream entrypoint
+    markdown-stream.svelte  animation-optimized streaming renderer
+    node.svelte             stream-aware node dispatcher
+    nodes/                  append-animation renderers
 ```
 
-Implementation-only modules are not re-exported. The package root exposes the static component,
-parser, and public types; `markdown-svelte/stream` exposes the parsed-node streaming component.
+Implementation-only modules are not re-exported. The package root exposes the normal renderer,
+parser, and public types; `markdown-svelte/stream` exposes the animation-optimized streaming
+renderer.
 
 ## Development
 

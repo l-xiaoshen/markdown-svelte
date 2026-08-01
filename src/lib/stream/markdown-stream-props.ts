@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'svelte/elements'
-import type { ParsedMarkdownNode } from '../markdown/renderable-node'
+import type { ParsedMarkdownNode } from '../renderable-node'
 
 export interface MarkdownStreamProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
 	/** The latest parser output. Replace the array when the stream advances. */

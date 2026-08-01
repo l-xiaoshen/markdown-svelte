@@ -1,6 +1,6 @@
 import { render } from 'svelte/server'
 import { describe, expect, it } from 'vitest'
-import { parseMarkdown } from '../markdown/parser'
+import { parseMarkdown } from '../parser'
 import MarkdownStream from './markdown-stream.svelte'
 import { resolveStreamingText } from './streaming-text.svelte'
 
