@@ -3,10 +3,10 @@
 	import NodeList from '../node-list.svelte'
 	import type { NodeProps } from '../node-props'
 
-	let { node }: NodeProps<ParserVmrContainerNode> = $props()
+	let { node, stream = false }: NodeProps<ParserVmrContainerNode> & { stream?: boolean } = $props()
 </script>
 
-<aside class="markdown-svelte-container">
+<aside class="markdown-svelte-container" class:markdown-svelte-stream-block-enter={stream}>
 	<strong class="markdown-svelte-container-title">{node.name}</strong>
 	<NodeList nodes={node.children} />
 </aside>

@@ -4,7 +4,7 @@ import type { ParsedMarkdownNode } from '../renderable-node'
 export interface MarkdownStreamProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
 	/** The latest parser output. Replace the array when the stream advances. */
 	nodes: readonly ParsedMarkdownNode[]
-	/** Fade append-only updates to text and inline code. */
+	/** Animate append-only text and structural size changes. */
 	animate?: boolean
 	baseUrl?: string | URL
 	idPrefix?: string

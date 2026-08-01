@@ -6,7 +6,7 @@ owned Svelte components rather than one generated HTML string.
 ## Install
 
 ```sh
-npm install markdown-svelte
+bun add markdown-svelte
 ```
 
 `svelte >= 5.16` is a peer dependency. `stream-markdown-parser` is included as a runtime dependency.
@@ -30,7 +30,7 @@ consumer, or another part of the application. The component accepts the latest p
 does not parse Markdown itself:
 
 ```sh
-npm install stream-markdown-parser
+bun add stream-markdown-parser
 ```
 
 ```svelte
@@ -53,16 +53,24 @@ npm install stream-markdown-parser
 
 Replace the `nodes` array whenever parser output changes. The renderer keys sibling positions so
 completed components stay mounted while an append-only stream grows, even when the parser returns
-fresh node objects. Text and inline-code additions fade in by default; other node renderers are shared
-with `MarkdownViewer`.
+fresh node objects. Text and inline-code additions fade in by default, code-block heights use a native
+CSS transition, and appended table rows use Svelte's `slide` transition with nonlinear easing. Rapid
+text chunks keep independent fades and merge into stable content only after they finish. New list,
+definition, and footnote items slide into layout; containers, rules, loaded images, math, and code
+metadata use restrained native entrances. Newly inserted block lines and atomic inline nodes receive a
+short fade so adjacent parser arrivals never pop in beside an animation already in progress.
 
 ```svelte
 <MarkdownStream {nodes} animate={false} baseUrl="https://docs.example.com/" idPrefix="answer" />
 ```
 
-Animation respects `prefers-reduced-motion`. Its timing can be customized with
-`--markdown-stream-fade-duration` and `--markdown-stream-fade-easing`. Positional identity is intended
-for append-oriented parser output; remount the component when switching it to a different document.
+Animation respects `prefers-reduced-motion`. Fade timing can be customized with
+`--markdown-stream-fade-duration` and `--markdown-stream-fade-easing`; code- and math-block sizing uses
+`--markdown-stream-size-duration` and `--markdown-stream-size-easing`. Container and media timing use
+`--markdown-stream-enter-duration`, `--markdown-stream-enter-easing`, and
+`--markdown-stream-media-duration`; new block lines use `--markdown-stream-line-duration` and
+`--markdown-stream-line-easing`. Positional identity is intended for append-oriented parser output;
+remount the component when switching it to a different document.
 
 Resolve relative links and images against a document URL and scope generated IDs when several
 documents share a page:

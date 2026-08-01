@@ -3,10 +3,14 @@
 	import NodeList from '../node-list.svelte'
 	import type { NodeProps } from '../node-props'
 
-	let { node }: NodeProps<ParserAdmonitionNode> = $props()
+	let { node, stream = false }: NodeProps<ParserAdmonitionNode> & { stream?: boolean } = $props()
 </script>
 
-<aside class="markdown-svelte-admonition" data-kind={node.kind.toLowerCase()}>
+<aside
+	class="markdown-svelte-admonition"
+	class:markdown-svelte-stream-block-enter={stream}
+	data-kind={node.kind.toLowerCase()}
+>
 	<strong class="markdown-svelte-admonition-title">{node.title || node.kind}</strong>
 	<NodeList nodes={node.children} />
 </aside>

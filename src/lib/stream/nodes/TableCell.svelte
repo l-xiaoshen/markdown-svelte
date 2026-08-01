@@ -1,0 +1,39 @@
+<script lang="ts">
+	import { slide } from 'svelte/transition'
+	import type { TableCellNode as ParserTableCellNode } from 'stream-markdown-parser'
+	import NodeList from '../../node-list.svelte'
+	import type { NodeProps } from '../../node-props'
+	import { streamSlide } from '../motion'
+
+	let { node }: NodeProps<ParserTableCellNode> = $props()
+</script>
+
+{#if node.header}
+	<th class="markdown-svelte-table-cell markdown-svelte-table-cell--header" style:text-align={node.align ?? 'left'}>
+		<div class="markdown-svelte-stream-table-cell" in:slide|global={streamSlide}>
+			<NodeList nodes={node.children} />
+		</div>
+	</th>
+{:else}
+	<td class="markdown-svelte-table-cell markdown-svelte-table-cell--body" style:text-align={node.align ?? 'left'}>
+		<div class="markdown-svelte-stream-table-cell" in:slide|global={streamSlide}>
+			<NodeList nodes={node.children} />
+		</div>
+	</td>
+{/if}
+
+<style>
+	:where(.markdown-svelte-table-cell) {
+		padding: 0;
+		vertical-align: top;
+	}
+
+	:where(.markdown-svelte-stream-table-cell) {
+		padding: 0.65rem 0.8rem;
+	}
+
+	:where(.markdown-svelte-table-cell--header) {
+		background: var(--_markdown-color-surface-strong);
+		font-weight: 700;
+	}
+</style>

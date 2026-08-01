@@ -5,62 +5,114 @@ interface StreamingTextOptions {
 	getAnimate: () => boolean
 }
 
-export interface StreamingTextParts {
-	stableContent: string
-	deltaContent: string
+export interface StreamingTextChunk {
+	id: number
+	content: string
+	settled: boolean
 }
 
-export function resolveStreamingText(content: string, previousContent: string, animate: boolean): StreamingTextParts {
+export type StreamingTextUpdate = { type: 'append'; content: string } | { type: 'replace'; content: string }
+
+export function resolveStreamingText(content: string, previousContent: string, animate: boolean): StreamingTextUpdate {
 	if (animate && content.length > previousContent.length && content.startsWith(previousContent)) {
-		return {
-			stableContent: previousContent,
-			deltaContent: content.slice(previousContent.length)
-		}
+		return { type: 'append', content: content.slice(previousContent.length) }
 	}
 
-	return {
-		stableContent: content,
-		deltaContent: ''
+	return { type: 'replace', content }
+}
+
+export class StreamingTextBuffer {
+	stableContent: string
+	pendingChunks: StreamingTextChunk[]
+
+	#previousContent: string
+	#previousAnimate: boolean
+	#nextChunkId = 0
+
+	constructor(content: string, animate: boolean) {
+		this.#previousContent = content
+		this.#previousAnimate = animate
+		this.stableContent = animate ? '' : content
+		this.pendingChunks = animate && content ? [this.#createChunk(content)] : []
+	}
+
+	update(content: string, animate: boolean): boolean {
+		if (content === this.#previousContent && animate === this.#previousAnimate) return false
+
+		const update = resolveStreamingText(content, this.#previousContent, animate)
+		if (update.type === 'append') {
+			this.pendingChunks = [...this.pendingChunks, this.#createChunk(update.content)]
+		} else {
+			this.stableContent = update.content
+			this.pendingChunks = []
+		}
+
+		this.#previousContent = content
+		this.#previousAnimate = animate
+		return true
+	}
+
+	settle(id: number): boolean {
+		const chunkIndex = this.pendingChunks.findIndex((chunk) => chunk.id === id)
+		if (chunkIndex === -1 || this.pendingChunks[chunkIndex].settled) return false
+
+		const chunks = this.pendingChunks.map((chunk, index) =>
+			index === chunkIndex ? { ...chunk, settled: true } : chunk
+		)
+		let settledCount = 0
+		while (chunks[settledCount]?.settled) settledCount += 1
+
+		if (settledCount > 0) {
+			this.stableContent += chunks
+				.slice(0, settledCount)
+				.map((chunk) => chunk.content)
+				.join('')
+			this.pendingChunks = chunks.slice(settledCount)
+		} else {
+			this.pendingChunks = chunks
+		}
+
+		return true
+	}
+
+	#createChunk(content: string): StreamingTextChunk {
+		return {
+			id: (this.#nextChunkId += 1),
+			content,
+			settled: false
+		}
 	}
 }
 
 export class StreamingText {
 	stableContent = $state('')
-	deltaContent = $state('')
-	revision = $state(0)
+	pendingChunks = $state<StreamingTextChunk[]>([])
 
-	#previousContent: string
-	#previousAnimate: boolean
+	#buffer: StreamingTextBuffer
 
 	constructor(private readonly options: StreamingTextOptions) {
 		const content = untrack(this.options.getContent)
 		const animate = untrack(this.options.getAnimate)
 
-		this.#previousContent = content
-		this.#previousAnimate = animate
-		this.stableContent = content
+		this.#buffer = new StreamingTextBuffer(content, animate)
+		this.#sync()
 
 		$effect.pre(() => {
 			const nextContent = this.options.getContent()
 			const nextAnimate = this.options.getAnimate()
 
 			untrack(() => {
-				if (nextContent === this.#previousContent && nextAnimate === this.#previousAnimate) {
-					return
-				}
-
-				this.#apply(resolveStreamingText(nextContent, this.#previousContent, nextAnimate))
-				this.#previousContent = nextContent
-				this.#previousAnimate = nextAnimate
+				if (this.#buffer.update(nextContent, nextAnimate)) this.#sync()
 			})
 		})
 	}
 
-	#apply(parts: StreamingTextParts): void {
-		this.stableContent = parts.stableContent
-		this.deltaContent = parts.deltaContent
-		if (parts.deltaContent) {
-			this.revision += 1
-		}
+	settle(id: number): void {
+		if (this.#buffer.settle(id)) this.#sync()
+	}
+
+	#sync(): void {
+		this.stableContent = this.#buffer.stableContent
+		this.pendingChunks = this.#buffer.pendingChunks
 	}
 }

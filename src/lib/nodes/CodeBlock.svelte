@@ -3,7 +3,7 @@
 	import type { CodeBlockNode as ParserCodeBlockNode } from 'stream-markdown-parser'
 	import type { NodeProps } from '../node-props'
 
-	let { node }: NodeProps<ParserCodeBlockNode> = $props()
+	let { node, stream = false }: NodeProps<ParserCodeBlockNode> & { stream?: boolean } = $props()
 	let copyState = $state<'idle' | 'copied' | 'failed'>('idle')
 	let resetTimer: ReturnType<typeof setTimeout> | undefined
 	let language = $derived(node.language.trim())
@@ -13,6 +13,12 @@
 		isDiff ? (language && language !== 'diff' ? `diff / ${language}` : 'diff') : language || 'text'
 	)
 	let copyContent = $derived(isDiff ? node.raw || node.updatedCode || node.code : node.code)
+
+	function streamHeight(content: string): string | undefined {
+		if (!stream) return undefined
+		const lines = content ? content.split('\n').length - Number(content.endsWith('\n')) : 0
+		return `calc(2rem + ${lines}lh)`
+	}
 
 	async function copyCode(): Promise<void> {
 		try {
@@ -38,7 +44,11 @@
 
 <div class="markdown-svelte-code-block">
 	<div class="markdown-svelte-code-header">
-		<span class="markdown-svelte-code-language">{languageLabel}</span>
+		{#key stream ? languageLabel : 'static'}
+			<span class="markdown-svelte-code-language" class:markdown-svelte-stream-code-language={stream}
+				>{languageLabel}</span
+			>
+		{/key}
 		<button
 			class="markdown-svelte-code-copy"
 			type="button"
@@ -55,15 +65,24 @@
 		<div class="markdown-svelte-diff">
 			<section class="markdown-svelte-diff-pane markdown-svelte-diff-pane--original">
 				<strong class="markdown-svelte-diff-label">Original</strong>
-				<pre class="markdown-svelte-code-pre"><code>{node.originalCode ?? ''}</code></pre>
+				<pre
+					class:markdown-svelte-stream-code-size={stream}
+					class="markdown-svelte-code-pre"
+					style:height={streamHeight(node.originalCode ?? '')}><code>{node.originalCode ?? ''}</code></pre>
 			</section>
 			<section class="markdown-svelte-diff-pane markdown-svelte-diff-pane--updated">
 				<strong class="markdown-svelte-diff-label">Updated</strong>
-				<pre class="markdown-svelte-code-pre"><code>{node.updatedCode ?? node.code}</code></pre>
+				<pre
+					class:markdown-svelte-stream-code-size={stream}
+					class="markdown-svelte-code-pre"
+					style:height={streamHeight(node.updatedCode ?? node.code)}><code>{node.updatedCode ?? node.code}</code></pre>
 			</section>
 		</div>
 	{:else}
-		<pre class="markdown-svelte-code-pre"><code>{node.code}</code></pre>
+		<pre
+			class:markdown-svelte-stream-code-size={stream}
+			class="markdown-svelte-code-pre"
+			style:height={streamHeight(node.code)}><code>{node.code}</code></pre>
 	{/if}
 </div>
 

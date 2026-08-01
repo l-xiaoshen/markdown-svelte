@@ -3,10 +3,12 @@
 	import NodeList from '../node-list.svelte'
 	import type { NodeProps } from '../node-props'
 
-	let { node }: NodeProps<ParserBlockquoteNode> = $props()
+	let { node, stream = false }: NodeProps<ParserBlockquoteNode> & { stream?: boolean } = $props()
 </script>
 
-<blockquote class="markdown-svelte-blockquote"><NodeList nodes={node.children} /></blockquote>
+<blockquote class="markdown-svelte-blockquote" class:markdown-svelte-stream-block-enter={stream}>
+	<NodeList nodes={node.children} />
+</blockquote>
 
 <style>
 	:where(.markdown-svelte-blockquote) {

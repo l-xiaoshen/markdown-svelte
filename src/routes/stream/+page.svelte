@@ -19,6 +19,31 @@
 		'nodes = parseMarkdownToStructure(buffer, parser)',
 		'```',
 		'',
+		'| Node | Streaming motion |',
+		'| --- | --- |',
+		'| Text | Delta fade |',
+		'| Tables and code | Native size |',
+		'',
+		'> Existing nodes stay mounted while new structure arrives.',
+		'',
+		'::: tip',
+		'List items, containers, math, and media use restrained native motion.',
+		':::',
+		'',
+		'---',
+		'',
+		'Inline math $x + y$ can stream into a block:',
+		'',
+		'$$',
+		'E = mc^2',
+		'$$',
+		'',
+		'![markdown-svelte mark](/favicon.svg)',
+		'',
+		'Motion remains independent[^motion].',
+		'',
+		'[^motion]: Completed chunks merge only after their own animation finishes.',
+		'',
 		'Append-only text updates can fade in without remounting the whole document.'
 	].join('\n')
 
@@ -103,6 +128,19 @@
 		running = false
 	}
 
+	function seek(event: Event): void {
+		const nextCursor = Number((event.currentTarget as HTMLInputElement).value)
+		running = false
+		cursor = nextCursor
+		chunkCount = 0
+		source = demoMarkdown.slice(0, cursor)
+		if (cursor === 0) {
+			nodes = []
+		} else {
+			parseCurrentSource(cursor === demoMarkdown.length)
+		}
+	}
+
 	onMount(() => {
 		running = true
 	})
@@ -119,16 +157,12 @@
 
 	$effect(() => {
 		cursor
-		const frame = requestAnimationFrame(() => {
-			if (sourceViewport) {
-				sourceViewport.scrollTo({ top: sourceViewport.scrollHeight, behavior: 'smooth' })
-			}
-			if (outputViewport) {
-				outputViewport.scrollTo({ top: outputViewport.scrollHeight, behavior: 'smooth' })
-			}
-		})
-
-		return () => cancelAnimationFrame(frame)
+		if (sourceViewport) {
+			sourceViewport.scrollTo({ top: sourceViewport.scrollHeight, behavior: 'smooth' })
+		}
+		if (outputViewport) {
+			outputViewport.scrollTo({ top: outputViewport.scrollHeight, behavior: 'smooth' })
+		}
 	})
 </script>
 
@@ -158,6 +192,20 @@
 				<button type="button" onclick={finish} disabled={complete}>Finish</button>
 			</div>
 
+			<label class="progress-control" for="stream-progress">
+				<span>Progress</span>
+				<input
+					id="stream-progress"
+					type="range"
+					min="0"
+					max={demoMarkdown.length}
+					value={cursor}
+					style:--stream-progress={`${progress}%`}
+					oninput={seek}
+				/>
+				<output for="stream-progress">{progress}%</output>
+			</label>
+
 			<div class="option-group">
 				<label>
 					Speed
@@ -169,7 +217,7 @@
 				</label>
 				<label class="checkbox-label">
 					<input type="checkbox" bind:checked={animate} />
-					Animate text
+					Animate motion
 				</label>
 			</div>
 
@@ -297,6 +345,60 @@
 
 	.option-group {
 		margin-left: auto;
+	}
+
+	.progress-control {
+		display: flex;
+		min-width: 12rem;
+		flex: 1;
+		align-items: center;
+		gap: 0.55rem;
+		color: #4b5563;
+		font-size: 0.76rem;
+	}
+
+	.progress-control input {
+		width: 100%;
+		min-width: 5rem;
+		height: 0.3rem;
+		flex: 1;
+		margin: 0;
+		appearance: none;
+		border: 0;
+		border-radius: 999px;
+		outline: 0;
+		background: linear-gradient(to right, #1558d6 0 var(--stream-progress), #d5dae2 var(--stream-progress) 100%);
+		accent-color: #1558d6;
+		cursor: pointer;
+	}
+
+	.progress-control input::-webkit-slider-thumb {
+		width: 0.9rem;
+		height: 0.9rem;
+		appearance: none;
+		border: 2px solid #fff;
+		border-radius: 50%;
+		background: #1558d6;
+		box-shadow: 0 0 0 1px #1558d6;
+	}
+
+	.progress-control input::-moz-range-thumb {
+		width: 0.65rem;
+		height: 0.65rem;
+		border: 2px solid #fff;
+		border-radius: 50%;
+		background: #1558d6;
+		box-shadow: 0 0 0 1px #1558d6;
+	}
+
+	.progress-control input:focus-visible {
+		box-shadow: 0 0 0 3px rgb(21 88 214 / 0.18);
+	}
+
+	.progress-control output {
+		width: 2.4rem;
+		font-variant-numeric: tabular-nums;
+		text-align: right;
 	}
 
 	.option-group label {
@@ -463,6 +565,10 @@
 		}
 
 		.option-group {
+			width: 100%;
+		}
+
+		.progress-control {
 			width: 100%;
 		}
 
