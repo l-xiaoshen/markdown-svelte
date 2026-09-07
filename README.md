@@ -9,7 +9,7 @@ owned Svelte components rather than one generated HTML string.
 bun add markdown-svelte
 ```
 
-`svelte >= 5.16` is a peer dependency. `stream-markdown-parser` is included as a runtime dependency.
+`svelte ^5.57.0` is a peer dependency. `stream-markdown-parser ^1.2.14` is included as a runtime dependency.
 
 ## Use
 
@@ -40,17 +40,27 @@ bun add stream-markdown-parser
 
 	const parser = getMarkdown('answer')
 	let source = ''
-	let nodes = $state<ParsedMarkdownNode[]>([])
+	let nodes = $state.raw<ParsedMarkdownNode[]>([])
 
 	function append(chunk: string, final = false) {
 		source += chunk
-		nodes = parseMarkdownToStructure(source, parser, { final })
+		nodes = parseMarkdownToStructure(source, parser, {
+			final,
+			reuseStableTopLevelNodes: true
+		})
 	}
 </script>
 
 <MarkdownStream {nodes} />
 ```
 
+Use one parser instance per active document. Call `append('', true)` when the stream ends if the last
+chunk was not already marked final. The default `streamParse: 'auto'` incrementally parses unfinished
+documents and performs a full final parse. Before starting a new document or replay, call
+`parser.stream?.reset?.()` and clear the source and node array.
+
+`reuseStableTopLevelNodes: true` lets the parser reuse completed top-level nodes during append-only
+updates. Treat parser output as immutable and use `$state.raw` to retain those object identities.
 Replace the `nodes` array whenever parser output changes. The renderer keys sibling positions so
 completed components stay mounted while an append-only stream grows, even when the parser returns
 fresh node objects. Text and inline-code additions fade in by default, code-block heights use a native
@@ -261,10 +271,15 @@ bun run check
 bun run prepack
 ```
 
+The project uses Bun 1.4.2 and TypeScript 7 for `check` and `check:watch` through `svelte-check --tsgo`.
+TypeScript 7 is installed as `@typescript/native`; TypeScript 6 remains installed for the JavaScript
+compiler API required by Svelte's current checking and packaging tools, following the
+[Svelte checker setup](https://github.com/sveltejs/language-tools/blob/master/packages/svelte-check/README.md#typescript-7-supports).
+
 Development pages:
 
 - `/` contains the package overview and live output.
-- `/playground` provides an editor and AST inspection.
+- `/stream` demonstrates incremental parsing, replay, seeking, and animated rendering.
 - `/examples` demonstrates syntax, sanitization, ID scoping, and relative URL resolution.
 
 ## License

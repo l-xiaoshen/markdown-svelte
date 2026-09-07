@@ -11,6 +11,7 @@ const parser = getMarkdown('markdown-svelte', {
 })
 
 export function parseMarkdown(source: string): ParsedMarkdownNode[] {
+	// This shared instance only handles complete documents; never retain streaming state between calls.
 	return parseMarkdownToStructure(source, parser, {
 		final: true,
 		streamParse: false,

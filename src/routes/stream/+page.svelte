@@ -16,7 +16,9 @@
 		'',
 		'```ts',
 		'buffer += chunk',
-		'nodes = parseMarkdownToStructure(buffer, parser)',
+		'nodes = parseMarkdownToStructure(buffer, parser, {',
+		'  final, reuseStableTopLevelNodes: true',
+		'})',
 		'```',
 		'',
 		'| Node | Streaming motion |',
@@ -49,16 +51,19 @@
 
 	const usageExample = [
 		'<' + 'script lang="ts">',
-		"\timport MarkdownStream from 'markdown-svelte/stream'",
+		"\timport MarkdownStream, { type ParsedMarkdownNode } from 'markdown-svelte/stream'",
 		"\timport { getMarkdown, parseMarkdownToStructure } from 'stream-markdown-parser'",
 		'',
 		"\tconst parser = getMarkdown('answer')",
 		"\tlet buffer = ''",
-		'\tlet nodes = $state([])',
+		'\tlet nodes = $state.raw<ParsedMarkdownNode[]>([])',
 		'',
 		'\tfunction append(chunk: string, final = false) {',
 		'\t\tbuffer += chunk',
-		'\t\tnodes = parseMarkdownToStructure(buffer, parser, { final })',
+		'\t\tnodes = parseMarkdownToStructure(buffer, parser, {',
+		'\t\t\tfinal,',
+		'\t\t\treuseStableTopLevelNodes: true',
+		'\t\t})',
 		'\t}',
 		'<' + '/script>',
 		'',
@@ -69,7 +74,7 @@
 	const parser = getMarkdown('markdown-svelte-stream-showcase')
 
 	let source = $state('')
-	let nodes = $state<ParsedMarkdownNode[]>([])
+	let nodes = $state.raw<ParsedMarkdownNode[]>([])
 	let cursor = $state(0)
 	let chunkCount = $state(0)
 	let running = $state(false)
@@ -83,7 +88,7 @@
 	let status = $derived(complete ? 'Complete' : running ? 'Running' : cursor === 0 ? 'Ready' : 'Paused')
 
 	function parseCurrentSource(final: boolean): void {
-		nodes = parseMarkdownToStructure(source, parser, { final })
+		nodes = parseMarkdownToStructure(source, parser, { final, reuseStableTopLevelNodes: true })
 	}
 
 	function pushChunk(): void {
@@ -105,6 +110,7 @@
 
 	function reset(autoplay = false): void {
 		running = false
+		parser.stream?.reset?.()
 		cursor = 0
 		chunkCount = 0
 		source = ''
@@ -135,6 +141,7 @@
 		chunkCount = 0
 		source = demoMarkdown.slice(0, cursor)
 		if (cursor === 0) {
+			parser.stream?.reset?.()
 			nodes = []
 		} else {
 			parseCurrentSource(cursor === demoMarkdown.length)
@@ -268,6 +275,10 @@
 <section class="page-section usage-section">
 	<h2>Usage</h2>
 	<p>Keep the parser and source buffer outside the renderer, then replace <code>nodes</code> after each parse.</p>
+	<p>
+		Use one parser per active document. Pass <code>final: true</code> when the stream ends, even if the last chunk is
+		empty, and call <code>parser.stream?.reset?.()</code> before starting a new document or replay.
+	</p>
 	<pre class="code-block"><code>{usageExample}</code></pre>
 </section>
 
