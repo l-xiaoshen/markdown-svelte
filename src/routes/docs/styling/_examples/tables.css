@@ -1,0 +1,12 @@
+.document .markdown-svelte-table-wrapper {
+	border: 0;
+	border-radius: 0;
+}
+
+.document .markdown-svelte-table-cell {
+	padding: 0.75rem 1rem;
+}
+
+.document .markdown-svelte-table-body .markdown-svelte-table-row:nth-child(even) {
+	background: #f3f4ee;
+}

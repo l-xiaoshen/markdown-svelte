@@ -1,286 +1,45 @@
 # markdown-svelte
 
-A typed Markdown renderer for Svelte 5. Markdown is parsed into structured nodes and rendered by
-owned Svelte components rather than one generated HTML string.
+A typed Markdown renderer for Svelte 5 with streaming support and customizable styles.
+
+[Playground](https://markdown-svelte.pages.dev/) · [Documentation](https://markdown-svelte.pages.dev/docs/) · [Examples](https://markdown-svelte.pages.dev/examples/)
 
 ## Install
 
 ```sh
-bun add markdown-svelte
+npm install markdown-svelte
 ```
 
-`svelte ^5.57.0` is a peer dependency. `stream-markdown-parser ^1.2.14` is included as a runtime dependency.
+Requires `svelte ^5.57.1`.
 
-## Use
+## Usage
 
 ```svelte
 <script lang="ts">
 	import { MarkdownViewer } from 'markdown-svelte'
-
-	let source = $state('# Hello, **Svelte**!')
 </script>
 
-<MarkdownViewer markdown={source} />
+<MarkdownViewer markdown="# Hello, **Svelte**!" />
 ```
 
-## Streaming parsed nodes
+For streaming, use `MarkdownStream` from `markdown-svelte/stream` with the
+[worker example](https://markdown-svelte.pages.dev/docs/#streaming).
 
-Use the dedicated `markdown-svelte/stream` entrypoint when parsing happens in a worker, an SSE
-consumer, or another part of the application. The component accepts the latest parsed node array and
-does not parse Markdown itself:
+Customize the appearance with CSS variables and element classes. See the
+[styling guide](https://markdown-svelte.pages.dev/docs/styling/).
 
-```sh
-bun add stream-markdown-parser
-```
-
-```svelte
-<script lang="ts">
-	import MarkdownStream, { type ParsedMarkdownNode } from 'markdown-svelte/stream'
-	import { getMarkdown, parseMarkdownToStructure } from 'stream-markdown-parser'
-
-	const parser = getMarkdown('answer')
-	let source = ''
-	let nodes = $state.raw<ParsedMarkdownNode[]>([])
-
-	function append(chunk: string, final = false) {
-		source += chunk
-		nodes = parseMarkdownToStructure(source, parser, {
-			final,
-			reuseStableTopLevelNodes: true
-		})
-	}
-</script>
-
-<MarkdownStream {nodes} />
-```
-
-Use one parser instance per active document. Call `append('', true)` when the stream ends if the last
-chunk was not already marked final. The default `streamParse: 'auto'` incrementally parses unfinished
-documents and performs a full final parse. Before starting a new document or replay, call
-`parser.stream?.reset?.()` and clear the source and node array.
-
-`reuseStableTopLevelNodes: true` lets the parser reuse completed top-level nodes during append-only
-updates. Treat parser output as immutable and use `$state.raw` to retain those object identities.
-Replace the `nodes` array whenever parser output changes. The renderer keys sibling positions so
-completed components stay mounted while an append-only stream grows, even when the parser returns
-fresh node objects. Text and inline-code additions fade in by default, code-block heights use a native
-CSS transition, and appended table rows use Svelte's `slide` transition with nonlinear easing. Rapid
-text chunks keep independent fades and merge into stable content only after they finish. New list,
-definition, and footnote items slide into layout; containers, rules, loaded images, math, and code
-metadata use restrained native entrances. Newly inserted block lines and atomic inline nodes receive a
-short fade so adjacent parser arrivals never pop in beside an animation already in progress.
-
-```svelte
-<MarkdownStream {nodes} animate={false} baseUrl="https://docs.example.com/" idPrefix="answer" />
-```
-
-Animation respects `prefers-reduced-motion`. Fade timing can be customized with
-`--markdown-stream-fade-duration` and `--markdown-stream-fade-easing`; code- and math-block sizing uses
-`--markdown-stream-size-duration` and `--markdown-stream-size-easing`. Container and media timing use
-`--markdown-stream-enter-duration`, `--markdown-stream-enter-easing`, and
-`--markdown-stream-media-duration`; new block lines use `--markdown-stream-line-duration` and
-`--markdown-stream-line-easing`. Positional identity is intended for append-oriented parser output;
-remount the component when switching it to a different document.
-
-Resolve relative links and images against a document URL and scope generated IDs when several
-documents share a page:
-
-```svelte
-<MarkdownViewer
-	markdown={source}
-	baseUrl="https://docs.example.com/guides/getting-started/"
-	idPrefix="getting-started"
-/>
-```
-
-## Component API
-
-`MarkdownViewer` renders an `<article>` and accepts standard article attributes.
-
-| Prop           | Type                | Default     | Purpose                                                  |
-| -------------- | ------------------- | ----------- | -------------------------------------------------------- |
-| `markdown`     | `string`            | required    | Markdown source                                          |
-| `allowRawHtml` | `boolean`           | `false`     | Render sanitized raw HTML                                |
-| `baseUrl`      | `string \| URL`     | `undefined` | Resolve relative links and images against an HTTP(S) URL |
-| `idPrefix`     | `string`            | `undefined` | Namespace heading, footnote, and local fragment IDs      |
-| `class`        | Svelte `ClassValue` | `undefined` | Add classes to the rendered article                      |
-
-```svelte
-<MarkdownViewer markdown={source} class={['document', { compact }]} aria-label="Rendered documentation" />
-```
-
-The root export also includes `MarkdownViewerProps`, `ParsedMarkdownNode`, and the parser:
-
-```ts
-import { parseMarkdown, type ParsedMarkdownNode } from 'markdown-svelte'
-
-const nodes: ParsedMarkdownNode[] = parseMarkdown('# API')
-```
-
-## Syntax
-
-The parser supports:
-
-- Headings, paragraphs, blockquotes, lists, links, images, thematic breaks, and code blocks
-- Tables, task lists, footnotes, and fenced containers such as `::: tip`
-- Strikethrough, highlights, insertions, subscripts, and superscripts
-- Inline and block math source
-- Optional sanitized raw HTML
-- Linkification, typographic punctuation, and Markdown line breaks
-- Split rendering for parser-provided diff blocks
-
-Math is displayed as source. The package does not bundle a math typesetter or syntax highlighter.
-
-## Styling
-
-No Tailwind configuration or global stylesheet is required. Every node renderer owns its markup and
-styles. Theme values are inherited through CSS custom properties set on the component or an ancestor:
-
-```css
-.product-docs {
-	--markdown-color-text: #172033;
-	--markdown-color-muted: #64748b;
-	--markdown-color-border: #d7dde7;
-	--markdown-color-surface: #f5f7fa;
-	--markdown-color-surface-strong: #e9edf3;
-	--markdown-color-link: #075985;
-	--markdown-color-accent: #a63a25;
-	--markdown-color-code: #e8edf5;
-	--markdown-code-background: #111827;
-	--markdown-code-text: #e5edf8;
-	--markdown-radius: 0.55rem;
-	--markdown-font-sans: system-ui, sans-serif;
-	--markdown-font-mono: ui-monospace, monospace;
-}
-```
-
-```svelte
-<MarkdownViewer markdown={source} class="product-docs" />
-```
-
-The default palette is neutral and light. Set the variables explicitly when the surrounding surface
-is dark.
-
-Every rendered node also has a stable `markdown-svelte-*` class. Built-in component rules use
-zero-specificity `:where(...)` selectors, so normal consumer selectors override them without
-`!important`:
-
-```css
-.product-docs .markdown-svelte-heading--2 {
-	margin-top: 3rem;
-	border-bottom: 0;
-	font-family: Georgia, serif;
-}
-
-.product-docs .markdown-svelte-paragraph {
-	max-width: 68ch;
-	font-size: 1.05rem;
-}
-
-.product-docs .markdown-svelte-link {
-	color: #be123c;
-	text-decoration-style: wavy;
-}
-
-.product-docs .markdown-svelte-code-block {
-	border-radius: 0;
-	box-shadow: none;
-}
-```
-
-Primary style hooks:
-
-| Area           | Classes                                                                                                                                  |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| Document       | `markdown-svelte`                                                                                                                        |
-| Typography     | `markdown-svelte-heading`, `markdown-svelte-heading--1` through `--6`, `markdown-svelte-paragraph`                                       |
-| Inline         | `markdown-svelte-link`, `markdown-svelte-inline-code`, `markdown-svelte-strong`, `markdown-svelte-emphasis`, `markdown-svelte-highlight` |
-| Lists          | `markdown-svelte-list`, `markdown-svelte-list--ordered`, `markdown-svelte-list-item`, `markdown-svelte-checkbox`                         |
-| Blocks         | `markdown-svelte-blockquote`, `markdown-svelte-admonition`, `markdown-svelte-container`                                                  |
-| Code           | `markdown-svelte-code-block`, `markdown-svelte-code-header`, `markdown-svelte-code-pre`, `markdown-svelte-code-copy`                     |
-| Tables         | `markdown-svelte-table-wrapper`, `markdown-svelte-table`, `markdown-svelte-table-row`, `markdown-svelte-table-cell`                      |
-| Footnotes      | `markdown-svelte-footnote`, `markdown-svelte-footnote-reference`, `markdown-svelte-footnote-backlink`                                    |
-| Media and HTML | `markdown-svelte-image`, `markdown-svelte-html-block`, `markdown-svelte-html-inline`                                                     |
-
-Inside a Svelte component's scoped `<style>`, wrap selectors with `:global(...)` when targeting the
-renderer's descendants.
-
-## Security
-
-Normal Markdown text and code are rendered through Svelte interpolation. Raw HTML rendering is
-disabled by default and its source is displayed as escaped text. Enable it explicitly for either
-renderer with `allowRawHtml`:
-
-```svelte
-<MarkdownViewer markdown={source} allowRawHtml />
-<MarkdownStream {nodes} allowRawHtml />
-```
-
-When enabled, raw HTML is passed through `stream-markdown-parser`'s safe sanitizer before `{@html}`
-is used. Scripts, embedded content, event handlers, styles, dangerous attributes, and active URL
-schemes are removed or rejected.
-
-Markdown links allow HTTP, HTTPS, email, telephone, fragment, root-relative, and relative URLs.
-Images use the parser's stricter image policy, which excludes active schemes and SVG data URLs.
-Protocol-relative URLs are rejected. External HTTP links open in a new tab with
-`rel="noopener noreferrer"`.
-
-Sanitization is not a replacement for application-level controls. For high-risk content, also use a
-Content Security Policy and resource limits.
-
-## Organization
-
-The package mirrors the ownership boundaries of the reference implementation:
-
-```text
-src/lib/
-  index.ts                  markdown-svelte entrypoint
-  markdown-viewer.svelte    public component and document orchestration
-  markdown-renderer.svelte  shared parsed-node document shell
-  parser.ts                 parser configuration
-  node-list.svelte          recursive list renderer
-  node.svelte               node-type dispatcher
-  document-anchors.ts       heading and footnote identity
-  paragraph-segments.ts     valid paragraph/block boundaries
-  nodes/                    one Svelte renderer per node type
-  stream/
-    index.ts                markdown-svelte/stream entrypoint
-    markdown-stream.svelte  animation-optimized streaming renderer
-    node.svelte             stream-aware node dispatcher
-    nodes/                  append-animation renderers
-```
-
-Implementation-only modules are not re-exported. The package root exposes the normal renderer,
-parser, and public types; `markdown-svelte/stream` exposes the animation-optimized streaming
-renderer.
+Raw HTML is disabled by default. Set `allowRawHtml` to render sanitized HTML.
 
 ## Development
 
-This repository follows the [SvelteKit packaging guide](https://svelte.dev/docs/kit/packaging):
-
-- `src/lib` is the package source.
-- `src/routes` is the local documentation and playground app.
-- `svelte-package` generates `dist` and type declarations.
-- `publint` validates the packed result.
-
 ```sh
+cp .env.example .env
 bun install
 bun run dev
-bun run test
-bun run check
-bun run prepack
 ```
 
-The project uses Bun 1.4.2 and TypeScript 7 for `check` and `check:watch` through `svelte-check --tsgo`.
-TypeScript 7 is installed as `@typescript/native`; TypeScript 6 remains installed for the JavaScript
-compiler API required by Svelte's current checking and packaging tools, following the
-[Svelte checker setup](https://github.com/sveltejs/language-tools/blob/master/packages/svelte-check/README.md#typescript-7-supports).
-
-Development pages:
-
-- `/` contains the package overview and live output.
-- `/stream` demonstrates incremental parsing, replay, seeking, and animated rendering.
-- `/examples` demonstrates syntax, sanitization, ID scoping, and relative URL resolution.
+Run `bun run check` and `bun run test` to validate changes. `bun run build` builds the site and package.
+Set `PUBLIC_BASE_URL` in the deployment environment when building the documentation site.
 
 ## License
 

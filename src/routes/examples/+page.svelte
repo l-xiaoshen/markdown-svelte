@@ -1,68 +1,18 @@
 <script lang="ts">
 	import { MarkdownViewer } from '$lib/index'
-
-	const basicMarkdown = `# Project notes
-
-This paragraph has **strong text**, _emphasis_, and a [link](https://svelte.dev).
-
-- First item
-- Second item
-
-> Markdown is rendered as semantic Svelte markup.`
-
-	const extendedMarkdown = `## Release checklist
-
-- [x] Render task lists
-- [x] Render tables
-- [ ] Publish the package
-
-| Feature | Status |
-| --- | ---: |
-| Server rendering | Ready |
-| Relative links | Ready |
-
-~~~ts
-import { MarkdownViewer } from 'markdown-svelte'
-~~~
-
-Footnote references include a return link.[^note]
-
-[^note]: This is the footnote content.`
-
-	const optionsMarkdown = `# Guide
-
-Relative links resolve against \`baseUrl\`, and generated IDs use the configured prefix.
-
-## Installation
-
-Open the [API reference](./api) for the next step.`
-
-	const styledMarkdown = `## Custom heading
-
-Use CSS variables for a theme and public classes for individual elements.
-
-\`inline code\` and [links](https://example.com) inherit the custom colors.`
-
-	const styledExample = [
-		'<MarkdownViewer markdown={source} class="custom-document" />',
-		'',
-		'<' + 'style>',
-		'\t:global(.custom-document) {',
-		'\t\t--markdown-color-link: #7c3aed;',
-		'\t\t--markdown-color-surface: #f5f3ff;',
-		'\t}',
-		'',
-		'\t:global(.custom-document .markdown-svelte-heading--2) {',
-		'\t\tborder-bottom: 2px solid #7c3aed;',
-		'\t}',
-		'<' + '/style>'
-	].join('\n')
+	import Seo from '../_components/Seo.svelte'
+	import basicMarkdown from './_examples/basic.md?raw'
+	import extendedMarkdown from './_examples/extended.md?raw'
+	import optionsMarkdown from './_examples/options.md?raw'
+	import styledMarkdown from './_examples/styled.md?raw'
+	import styledExample from './_examples/Styled.svelte?raw'
 </script>
 
-<svelte:head>
-	<title>Examples | markdown-svelte</title>
-	<meta name="description" content="Rendered markdown-svelte usage examples." />
-</svelte:head>
+<Seo
+	title="Markdown examples | markdown-svelte"
+	description="Explore Svelte 5 Markdown examples for headings, tables, task lists, code blocks, footnotes, relative links, and custom styles."
+	path="/examples/"
+/>
 
 <header class="page-header">
 	<h1>Examples</h1>
@@ -77,7 +27,7 @@ Use CSS variables for a theme and public classes for individual elements.
 	<div class="example-grid">
 		<div class="example-panel source-panel">
 			<h3>Source</h3>
-			<pre><code>{basicMarkdown}</code></pre>
+			<pre><code>{basicMarkdown.trimEnd()}</code></pre>
 		</div>
 		<div class="example-panel output-panel">
 			<h3>Output</h3>
@@ -96,7 +46,7 @@ Use CSS variables for a theme and public classes for individual elements.
 	<div class="example-grid">
 		<div class="example-panel source-panel">
 			<h3>Source</h3>
-			<pre><code>{extendedMarkdown}</code></pre>
+			<pre><code>{extendedMarkdown.trimEnd()}</code></pre>
 		</div>
 		<div class="example-panel output-panel">
 			<h3>Output</h3>
@@ -118,7 +68,7 @@ Use CSS variables for a theme and public classes for individual elements.
 	<div class="example-grid">
 		<div class="example-panel source-panel">
 			<h3>Source</h3>
-			<pre><code>{optionsMarkdown}</code></pre>
+			<pre><code>{optionsMarkdown.trimEnd()}</code></pre>
 		</div>
 		<div class="example-panel output-panel">
 			<h3>Output</h3>
@@ -137,7 +87,7 @@ Use CSS variables for a theme and public classes for individual elements.
 	<div class="example-grid">
 		<div class="example-panel source-panel">
 			<h3>Component and CSS</h3>
-			<pre><code>{styledExample}</code></pre>
+			<pre><code>{styledExample.trimEnd()}</code></pre>
 		</div>
 		<div class="example-panel output-panel">
 			<h3>Output</h3>

@@ -1,0 +1,16 @@
+{
+	"name": "markdown-svelte",
+	"short_name": "markdown-svelte",
+	"description": "A typed Markdown renderer for Svelte 5, with smooth streaming, documentation, and an interactive playground.",
+	"id": "./",
+	"start_url": "./",
+	"scope": "./",
+	"display": "browser",
+	"lang": "en",
+	"background_color": "#fcfcf9",
+	"theme_color": "#fcfcf9",
+	"icons": [
+		{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+		{ "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+	]
+}

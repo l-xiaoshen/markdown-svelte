@@ -1,0 +1,8 @@
+.document .markdown-svelte-heading--2 {
+	margin-top: 2.5em;
+	border-bottom: 0;
+}
+
+.document .markdown-svelte-paragraph {
+	margin-block: 1em;
+}

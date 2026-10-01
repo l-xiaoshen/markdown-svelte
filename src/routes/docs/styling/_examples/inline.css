@@ -1,0 +1,19 @@
+.document .markdown-svelte-link {
+	text-decoration-thickness: 0.1em;
+	text-underline-offset: 0.2em;
+}
+
+.document .markdown-svelte-link:focus-visible {
+	outline: 2px solid currentColor;
+	outline-offset: 3px;
+}
+
+.document .markdown-svelte-highlight {
+	background: #e5edcf;
+	color: #34451f;
+}
+
+.document .markdown-svelte-inline-code {
+	border: 0;
+	border-radius: 0;
+}

@@ -1,0 +1,8 @@
+.document .markdown-svelte-html-block details {
+	padding-block: 0.75rem;
+	border-bottom: 1px solid #dce1d3;
+}
+
+.document .markdown-svelte-html-escaped {
+	font-family: ui-monospace, monospace;
+}

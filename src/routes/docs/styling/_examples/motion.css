@@ -1,0 +1,7 @@
+.document {
+	--markdown-stream-fade-duration: 200ms;
+	--markdown-stream-line-duration: 100ms;
+	--markdown-stream-size-duration: 160ms;
+	--markdown-stream-enter-duration: 140ms;
+	--markdown-stream-media-duration: 160ms;
+}

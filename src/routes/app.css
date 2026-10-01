@@ -7,8 +7,8 @@
 		BlinkMacSystemFont,
 		'Segoe UI',
 		sans-serif;
-	color: #202124;
-	background: #ffffff;
+	color: #292b29;
+	background: #fcfcf9;
 	font-synthesis: none;
 	text-rendering: optimizeLegibility;
 }
@@ -52,13 +52,14 @@ code {
 }
 
 .site-header {
-	border-bottom: 1px solid #d9dde3;
+	border-bottom: 1px solid #e6e8df;
+	background: #fff;
 }
 
 .site-header-inner {
 	display: flex;
-	width: min(100% - 2.5rem, 72rem);
-	min-height: 4rem;
+	width: min(100% - 5rem, 80rem);
+	min-height: 2.75rem;
 	align-items: center;
 	justify-content: space-between;
 	gap: 2rem;
@@ -66,9 +67,25 @@ code {
 }
 
 .site-brand {
-	color: #202124;
-	font-weight: 700;
+	display: inline-flex;
+	align-items: center;
+	color: #35372f;
+	font-size: 0.95rem;
+	font-weight: 600;
+	letter-spacing: -0.04em;
 	text-decoration: none;
+}
+
+.brand-mark {
+	display: block;
+	width: 2rem;
+	height: 2rem;
+	flex: none;
+	margin-right: 0.5rem;
+}
+
+.brand-svelte {
+	color: #8c9182;
 }
 
 .site-brand:hover {
@@ -78,13 +95,30 @@ code {
 .site-nav {
 	display: flex;
 	align-items: center;
-	gap: 1.25rem;
+	gap: 1.8rem;
 }
 
 .site-nav a {
-	color: #4b5563;
-	font-size: 0.9rem;
+	position: relative;
+	display: inline-flex;
+	min-height: 2.75rem;
+	align-items: center;
+	color: #6d7461;
+	font-size: 0.76rem;
 	text-decoration: none;
+}
+
+.site-nav a[aria-current='page'] {
+	color: #bd4b29;
+}
+.site-nav a[aria-current='page']::after {
+	position: absolute;
+	right: 0;
+	bottom: -1px;
+	left: 0;
+	height: 2px;
+	background: #c74824;
+	content: '';
 }
 
 .site-nav a:hover,
@@ -100,13 +134,30 @@ code {
 	padding: 3.5rem 0 5rem;
 }
 
+.site-main.playground-main {
+	width: min(100% - 5rem, 80rem);
+	padding: 2rem 0 3rem;
+}
+
 .site-footer {
-	width: min(100% - 2.5rem, 72rem);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	width: min(100% - 5rem, 80rem);
 	margin: 0 auto;
 	padding: 1.5rem 0 2.5rem;
-	border-top: 1px solid #d9dde3;
-	color: #6b7280;
-	font-size: 0.85rem;
+	border-top: 1px solid #e3e6db;
+	color: #737969;
+	font-size: 0.64rem;
+}
+
+.site-footer span {
+	margin: 0 0.35rem;
+}
+.site-footer a {
+	color: inherit;
+	text-decoration: none;
 }
 
 .site-footer p {
@@ -184,6 +235,7 @@ code {
 @media (max-width: 40rem) {
 	.site-header-inner,
 	.site-main,
+	.site-main.playground-main,
 	.site-footer {
 		width: min(100% - 2rem, 72rem);
 	}
@@ -193,6 +245,12 @@ code {
 	}
 
 	.site-brand {
+		font-size: 0.8rem;
+	}
+	.brand-mark {
+		width: 1.4rem;
+		height: 1.3rem;
+		margin-right: 0.4rem;
 		font-size: 0.9rem;
 	}
 
@@ -201,10 +259,17 @@ code {
 	}
 
 	.site-nav a {
-		font-size: 0.8rem;
+		font-size: 0.65rem;
 	}
 
 	.site-main {
 		padding-top: 2.5rem;
+	}
+	.site-main.playground-main {
+		padding-top: 1.7rem;
+	}
+	.site-footer {
+		flex-wrap: wrap;
+		font-size: 0.6rem;
 	}
 }

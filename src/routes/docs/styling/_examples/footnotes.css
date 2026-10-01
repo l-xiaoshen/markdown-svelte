@@ -1,0 +1,7 @@
+.document .markdown-svelte-footnote {
+	font-size: 0.85rem;
+}
+
+.document .markdown-svelte-footnote-reference-link {
+	text-decoration: none;
+}

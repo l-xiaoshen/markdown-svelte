@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" color="#ff3e00">
+  <title>markdown-svelte — Markdown for Svelte 5</title>
+  <desc>Typed components, smooth streaming, and an interactive Markdown playground.</desc>
+  <defs><symbol id="brand" viewBox="0 0 250 250"><path
+		fill="currentColor"
+		fill-rule="evenodd"
+		d="
+			M 162 151 V 128
+			Q 162 122 157 125
+			C 145 132 143 140 143 147
+			V 167
+			C 143 185 130 199 110 199
+			C 93 199 84 189 81 174
+			C 78 189 66 199 50 199
+			C 31 199 18 186 18 168
+			V 119
+			C 18 84 45 55 79 55
+			C 94 55 108 61 119 71
+			C 131 62 149 55 164 55
+			C 199 55 227 83 227 117
+			V 151 H 235
+			Q 243 151 243 159
+			Q 243 162 240 165
+			L 204 201
+			Q 196 209 188 201
+			L 153 166
+			Q 150 163 150 159
+			Q 150 151 158 151
+			Z
+
+			M 60 167 V 119
+			A 20 20 0 0 1 100 119
+			V 167
+			A 9 9 0 0 0 118 167
+			V 144
+			C 118 124 129 114 143 106
+			C 151 101 156 99 163 99
+			C 177 99 185 109 185 123
+			V 156
+			Q 185 162 180 162
+			H 177
+			Q 174 162 174 164
+			Q 174 165 175 166
+			L 193 184
+			Q 196 187 199 184
+			L 217 166
+			Q 218 165 218 164
+			Q 218 162 215 162
+			H 208
+			Q 202 162 202 156
+			V 116
+			C 202 95 186 79 164 79
+			C 146 79 134 85 121 99
+			Q 117 103 113 99
+			C 104 85 92 79 79 79
+			C 58 79 41 96 41 117
+			V 167
+			A 9.5 9.5 0 0 0 60 167
+			Z
+		"
+	/></symbol></defs>
+  <rect width="1200" height="630" fill="#fcfcf9" />
+  <path d="M72 144H1128" stroke="#e2e5da" />
+  <use href="#brand" x="64" y="51" width="70" height="70" />
+  <g font-family="DejaVu Sans, Arial, sans-serif" fill="#292b29">
+    <text x="153" y="101" font-size="32" font-weight="700" letter-spacing="-1.4">markdown<tspan fill="#8c9182">-svelte</tspan></text>
+    <text x="72" y="254" font-size="66" font-weight="700" letter-spacing="-3.2">Markdown for</text>
+    <text x="72" y="334" font-size="66" font-weight="700" letter-spacing="-3.2">Svelte 5.</text>
+    <text x="74" y="398" font-size="25" fill="#6d7461">Typed components. Smooth streaming.</text>
+    <text x="1128" y="97" text-anchor="end" font-size="18" fill="#6d7461">OPEN SOURCE · MIT</text>
+  </g>
+  <use href="#brand" x="809" y="217" width="305" height="305" />
+  <rect x="72" y="458" width="590" height="70" rx="8" fill="#f0f2e9" stroke="#e2e5da" />
+  <text x="96" y="502" fill="#687959" font-family="DejaVu Sans Mono, monospace" font-size="25">npm install <tspan fill="#292b29">markdown-svelte</tspan></text>
+  <text x="72" y="584" fill="#828778" font-family="DejaVu Sans, Arial, sans-serif" font-size="19">Playground / Documentation / Examples</text>
+</svg>

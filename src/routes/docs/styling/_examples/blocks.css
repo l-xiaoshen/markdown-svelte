@@ -1,0 +1,18 @@
+.document .markdown-svelte-blockquote {
+	border-radius: 0;
+	background: transparent;
+	font-style: italic;
+}
+
+.document .markdown-svelte-admonition[data-kind='warning'] {
+	border-color: #986315;
+	background: #fff8e8;
+}
+
+.document .markdown-svelte-admonition[data-kind='warning'] .markdown-svelte-admonition-title {
+	color: #70460c;
+}
+
+.document .markdown-svelte-thematic-break {
+	margin-block: 2rem;
+}

@@ -1,8 +1,6 @@
 <script lang="ts">
-	import { slide } from 'svelte/transition'
 	import type { MathBlockNode as ParserMathBlockNode } from 'stream-markdown-parser'
 	import type { NodeProps } from '../../node-props'
-	import { streamSlide } from '../motion'
 	import StreamingContent from './StreamingContent.svelte'
 
 	let { node }: NodeProps<ParserMathBlockNode> = $props()
@@ -12,7 +10,6 @@
 <pre
 	class="markdown-svelte-math-block markdown-svelte-stream-math-block markdown-svelte-stream-math-size"
 	style:height={`calc(2rem + ${lines}lh)`}
-	in:slide|global={streamSlide}
 	aria-label="Math block"><code><StreamingContent content={node.content} /></code></pre>
 
 <style>

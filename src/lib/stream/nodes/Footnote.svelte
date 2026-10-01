@@ -1,17 +1,15 @@
 <script lang="ts">
-	import { slide } from 'svelte/transition'
 	import type { FootnoteNode as ParserFootnoteNode } from 'stream-markdown-parser'
 	import NodeList from '../../node-list.svelte'
 	import type { NodeProps } from '../../node-props'
 	import { useRenderContext } from '../../render-context'
-	import { streamSlide } from '../motion'
 
 	let { node }: NodeProps<ParserFootnoteNode> = $props()
 	const context = useRenderContext()
 	let id = $derived(context.anchors.footnoteIds.get(node))
 </script>
 
-<div class="markdown-svelte-footnote markdown-svelte-stream-footnote" {id} in:slide|global={streamSlide}>
+<div class="markdown-svelte-footnote markdown-svelte-stream-footnote" {id}>
 	<sup class="markdown-svelte-footnote-label">{node.id}</sup>
 	<div class="markdown-svelte-footnote-content"><NodeList nodes={node.children} /></div>
 </div>

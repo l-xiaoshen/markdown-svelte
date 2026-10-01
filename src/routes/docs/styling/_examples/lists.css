@@ -1,0 +1,15 @@
+.document .markdown-svelte-list--unordered {
+	list-style-type: square;
+}
+
+.document .markdown-svelte-list-item::marker {
+	color: #6d7461;
+}
+
+.document .markdown-svelte-checkbox {
+	accent-color: #6d7461;
+}
+
+.document .markdown-svelte-definition-description {
+	margin-inline-start: 1.5rem;
+}

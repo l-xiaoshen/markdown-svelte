@@ -14,6 +14,7 @@
 			var(--markdown-stream-fade-easing, cubic-bezier(0.33, 0, 0.67, 1)) backwards;
 	}
 
+	/* Growing content needs its natural height and margin layout throughout entry. */
 	:global(
 		.markdown-svelte-stream
 			> :where(
@@ -28,6 +29,11 @@
 	:global(
 		.markdown-svelte-stream
 			:where(
+				.markdown-svelte-stream-list-item,
+				.markdown-svelte-stream-definition-item,
+				.markdown-svelte-stream-footnote,
+				.markdown-svelte-stream-table-cell,
+				.markdown-svelte-stream-math-block,
 				.markdown-svelte-emoji,
 				.markdown-svelte-checkbox,
 				.markdown-svelte-footnote-reference,
@@ -133,17 +139,6 @@
 			animation: none;
 		}
 
-		:global(.markdown-svelte-stream .markdown-svelte-stream-table-cell) {
-			animation: none !important;
-		}
-
-		:global(.markdown-svelte-stream .markdown-svelte-stream-list-item),
-		:global(.markdown-svelte-stream .markdown-svelte-stream-definition-item),
-		:global(.markdown-svelte-stream .markdown-svelte-stream-footnote),
-		:global(.markdown-svelte-stream .markdown-svelte-stream-math-block) {
-			animation: none !important;
-		}
-
 		:global(.markdown-svelte-stream .markdown-svelte-stream-block-enter),
 		:global(.markdown-svelte-stream .markdown-svelte-stream-rule),
 		:global(.markdown-svelte-stream .markdown-svelte-stream-code-language) {
@@ -175,6 +170,11 @@
 		:global(
 			.markdown-svelte-stream
 				:where(
+					.markdown-svelte-stream-list-item,
+					.markdown-svelte-stream-definition-item,
+					.markdown-svelte-stream-footnote,
+					.markdown-svelte-stream-table-cell,
+					.markdown-svelte-stream-math-block,
 					.markdown-svelte-emoji,
 					.markdown-svelte-checkbox,
 					.markdown-svelte-footnote-reference,

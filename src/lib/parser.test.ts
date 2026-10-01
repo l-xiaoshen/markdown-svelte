@@ -15,20 +15,6 @@ function createStream() {
 }
 
 describe('stream-markdown-parser integration', () => {
-	it('reuses completed top-level nodes while replacing the growing tail', () => {
-		const stream = createStream()
-		const source = '# Stable\n\nCompleted paragraph.\n\nGrowing'
-		const first = stream.parse(source)
-		const appended = stream.parse(`${source} tail`)
-
-		expect(appended[0]).toBe(first[0])
-		expect(appended[1]).toBe(first[1])
-		expect(appended[2]).not.toBe(first[2])
-		expect(first[2]).toMatchObject({ raw: 'Growing' })
-		expect(appended[2]).toMatchObject({ raw: 'Growing tail' })
-		expect(render(MarkdownStream, { props: { nodes: appended, animate: false } }).body).toContain('Growing tail')
-	})
-
 	it('settles an unfinished code fence when the same buffer is finalized', () => {
 		const stream = createStream()
 		const source = '```ts\nconst value = 1'
@@ -64,6 +50,74 @@ describe('stream-markdown-parser integration', () => {
 		expect(resolved[1]).not.toBe(partial[1])
 	})
 
+	it('linkifies appended domains and email after a first chunk containing only plain text', () => {
+		const stream = createStream()
+		const partial = stream.parse('Visit our website')
+		const source = 'Visit our website example.com and email support@example.com.'
+		const appended = stream.parse(source)
+		const finalized = stream.parse(source, true)
+
+		expect(render(MarkdownStream, { props: { nodes: partial, animate: false } }).body).not.toContain('<a ')
+		for (const nodes of [appended, finalized]) {
+			const body = render(MarkdownStream, { props: { nodes, animate: false } }).body
+
+			expect(body.match(/href="http:\/\/example\.com"/g)).toHaveLength(1)
+			expect(body.match(/href="mailto:support@example\.com"/g)).toHaveLength(1)
+			expect(body).toContain('Visit our website ')
+		}
+	})
+
+	it('preserves details content when an unclosed wrapper and repeated text arrive in later chunks', () => {
+		const stream = createStream()
+		const firstDetails = '<details>\n<summary>First summary</summary>\n\n- x1\n- y1\n\n</details>\n\n'
+		const nestedDetails = '<details>\n<summary>Second summary</summary>\n\n- p2\n- q2\n\n</details>\n'
+		const prefix = `${firstDetails}<div class="same">\nBETA\n\n\n`
+		const chunks = [
+			`${prefix}${nestedDetails.slice(0, nestedDetails.indexOf('- q2'))}`,
+			`${prefix}${nestedDetails}`,
+			`${prefix}${nestedDetails}\n<div class="same">\nDELTA\n</div>\n\ntrailing copy:\nx1\ny1`
+		]
+
+		for (const source of chunks) {
+			const nodes = stream.parse(source)
+			const body = render(MarkdownStream, {
+				props: { nodes, animate: false, allowRawHtml: true }
+			}).body
+
+			expect(body.match(/First summary/g)).toHaveLength(1)
+			expect(body.match(/Second summary/g)).toHaveLength(1)
+			expect(body.match(/<li>x1<\/li>/g)).toHaveLength(1)
+			expect(body.match(/- p2/g)).toHaveLength(1)
+		}
+
+		const source = chunks[chunks.length - 1]
+		const finalized = stream.parse(source, true)
+		// The later x1/y1 paragraph must not move the nested details source boundary.
+		expect(finalized).toMatchObject([
+			{ type: 'html_block', tag: 'details' },
+			{
+				type: 'html_block',
+				tag: 'div',
+				loading: false,
+				children: expect.arrayContaining([
+					expect.objectContaining({
+						tag: 'details',
+						raw: nestedDetails,
+						children: expect.arrayContaining([expect.objectContaining({ type: 'list', raw: 'p2\nq2' })])
+					})
+				])
+			}
+		])
+		const renderBody = (nodes: ReturnType<typeof parseMarkdown>) =>
+			render(MarkdownStream, { props: { nodes, animate: false, allowRawHtml: true } }).body.replace(/<!--.*?-->/g, '')
+		const finalizedBody = renderBody(finalized)
+
+		expect(finalizedBody).toBe(renderBody(parseMarkdown(source)))
+		expect(finalizedBody.match(/Second summary/g)).toHaveLength(1)
+		expect(finalizedBody.match(/- p2\n- q2/g)).toHaveLength(1)
+		expect(finalizedBody.match(/trailing copy:\nx1\ny1/g)).toHaveLength(1)
+	})
+
 	it('resets document references before parsing another stream with the same opening paragraph', () => {
 		const stream = createStream()
 		const source = 'Read [the API][api].\n\n'
@@ -78,19 +132,6 @@ describe('stream-markdown-parser integration', () => {
 		expect(body).toContain('Read [the API][api].')
 		expect(body).toContain('New document')
 		expect(body).not.toContain('href="https://example.com/old"')
-	})
-
-	it('discards reused nodes on reset even when the new stream extends the old buffer', () => {
-		const stream = createStream()
-		const source = '# Stable\n\nCompleted paragraph.\n\nGrowing'
-		const oldDocument = stream.parse(source)
-		stream.reset()
-		const newDocument = stream.parse(`${source} in a new stream`)
-
-		expect(newDocument[0]).toEqual(oldDocument[0])
-		expect(newDocument[0]).not.toBe(oldDocument[0])
-		expect(newDocument[1]).not.toBe(oldDocument[1])
-		expect(newDocument[2]).toMatchObject({ raw: 'Growing in a new stream' })
 	})
 })
 

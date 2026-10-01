@@ -1,0 +1,12 @@
+.document .markdown-svelte-code-block {
+	border-radius: 0;
+	box-shadow: none;
+}
+
+.document .markdown-svelte-code-pre {
+	font-size: 0.9rem;
+}
+
+.document .markdown-svelte-code-copy[data-state='copied'] {
+	color: #bbf7d0;
+}

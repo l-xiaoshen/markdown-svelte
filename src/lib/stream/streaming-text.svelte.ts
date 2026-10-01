@@ -11,16 +11,6 @@ export interface StreamingTextChunk {
 	settled: boolean
 }
 
-export type StreamingTextUpdate = { type: 'append'; content: string } | { type: 'replace'; content: string }
-
-export function resolveStreamingText(content: string, previousContent: string, animate: boolean): StreamingTextUpdate {
-	if (animate && content.length > previousContent.length && content.startsWith(previousContent)) {
-		return { type: 'append', content: content.slice(previousContent.length) }
-	}
-
-	return { type: 'replace', content }
-}
-
 export class StreamingTextBuffer {
 	stableContent: string
 	pendingChunks: StreamingTextChunk[]
@@ -39,11 +29,10 @@ export class StreamingTextBuffer {
 	update(content: string, animate: boolean): boolean {
 		if (content === this.#previousContent && animate === this.#previousAnimate) return false
 
-		const update = resolveStreamingText(content, this.#previousContent, animate)
-		if (update.type === 'append') {
-			this.pendingChunks = [...this.pendingChunks, this.#createChunk(update.content)]
+		if (animate && content.length > this.#previousContent.length && content.startsWith(this.#previousContent)) {
+			this.pendingChunks = [...this.pendingChunks, this.#createChunk(content.slice(this.#previousContent.length))]
 		} else {
-			this.stableContent = update.content
+			this.stableContent = content
 			this.pendingChunks = []
 		}
 

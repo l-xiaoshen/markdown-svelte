@@ -1,0 +1,9 @@
+.document .markdown-svelte-math-inline {
+	border: 0;
+	background: transparent;
+}
+
+.document .markdown-svelte-math-block {
+	border-radius: 0;
+	text-align: center;
+}

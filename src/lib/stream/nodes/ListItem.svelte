@@ -1,10 +1,8 @@
 <script lang="ts">
-	import { slide } from 'svelte/transition'
 	import type { ListItemNode as ParserListItemNode, ParagraphNode, ParsedNode } from 'stream-markdown-parser'
 	import NodeList from '../../node-list.svelte'
 	import type { NodeProps } from '../../node-props'
 	import { isNodeType } from '../../renderable-node'
-	import { streamItemSlide } from '../motion'
 
 	let { node }: NodeProps<ParserListItemNode> = $props()
 
@@ -26,7 +24,6 @@
 <li
 	class="markdown-svelte-list-item markdown-svelte-stream-list-item"
 	class:markdown-svelte-list-item--task={taskParagraph !== undefined}
-	in:slide|global={streamItemSlide}
 >
 	{#if taskParagraph}
 		<div class="markdown-svelte-task-content"><NodeList nodes={taskParagraph.children} /></div>
