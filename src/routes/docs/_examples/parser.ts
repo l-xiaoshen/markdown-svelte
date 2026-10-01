@@ -1,3 +1,3 @@
-import { parseMarkdown, type MarkdownViewerProps, type ParsedMarkdownNode } from 'markdown-svelte'
+import { parseMarkdown, type ParsedMarkdownNode } from 'markdown-svelte'
 
 const nodes: ParsedMarkdownNode[] = parseMarkdown('# API')

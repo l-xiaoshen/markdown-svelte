@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
-	import MarkdownStream, { type ParsedMarkdownNode } from 'markdown-svelte/stream'
+	import type { ParsedMarkdownNode } from 'markdown-svelte'
+	import { MarkdownStream } from 'markdown-svelte/stream'
 
 	let nodes = $state.raw<ParsedMarkdownNode[]>([])
 

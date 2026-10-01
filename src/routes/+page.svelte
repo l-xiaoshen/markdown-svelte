@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { PUBLIC_BASE_URL } from '$env/static/public'
-	import Playground from './_components/Playground.svelte'
+	import Playground from './_playground/Playground.svelte'
 	import Seo from './_components/Seo.svelte'
 
 	const description =

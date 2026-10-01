@@ -14,16 +14,14 @@
 				></a
 			>
 			<nav class="site-nav" aria-label="Main navigation">
-				<a href="/" aria-current={page.url.pathname === '/' || page.url.pathname === '/stream/' ? 'page' : undefined}
-					>Playground</a
-				>
+				<a href="/" aria-current={page.url.pathname === '/' ? 'page' : undefined}>Playground</a>
 				<a href="/docs/" aria-current={page.url.pathname.startsWith('/docs/') ? 'page' : undefined}>Docs</a>
 				<a href="/examples/" aria-current={page.url.pathname === '/examples/' ? 'page' : undefined}>Examples</a>
 			</nav>
 		</div>
 	</header>
 
-	<main class="site-main" class:playground-main={page.url.pathname === '/' || page.url.pathname === '/stream/'}>
+	<main class="site-main" class:playground-main={page.url.pathname === '/'}>
 		{@render children()}
 	</main>
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { MathInlineNode as ParserMathInlineNode } from 'stream-markdown-parser'
-	import type { NodeProps } from '../../node-props'
+	import type { NodeProps } from '../../render/node-props'
 	import StreamingContent from './StreamingContent.svelte'
 
 	let { node }: NodeProps<ParserMathInlineNode> = $props()

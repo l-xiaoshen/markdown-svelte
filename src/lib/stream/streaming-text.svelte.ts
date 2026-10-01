@@ -1,35 +1,25 @@
-import { untrack } from 'svelte'
-
-interface StreamingTextOptions {
-	getContent: () => string
-	getAnimate: () => boolean
-}
-
-export interface StreamingTextChunk {
+interface StreamingTextChunk {
 	id: number
 	content: string
 	settled: boolean
 }
 
-export class StreamingTextBuffer {
-	stableContent: string
-	pendingChunks: StreamingTextChunk[]
+export class StreamingText {
+	stableContent = $state('')
+	pendingChunks = $state.raw<StreamingTextChunk[]>([])
 
 	#previousContent: string
-	#previousAnimate: boolean
 	#nextChunkId = 0
 
-	constructor(content: string, animate: boolean) {
+	constructor(content: string) {
 		this.#previousContent = content
-		this.#previousAnimate = animate
-		this.stableContent = animate ? '' : content
-		this.pendingChunks = animate && content ? [this.#createChunk(content)] : []
+		this.pendingChunks = content ? [this.#createChunk(content)] : []
 	}
 
-	update(content: string, animate: boolean): boolean {
-		if (content === this.#previousContent && animate === this.#previousAnimate) return false
+	update(content: string): void {
+		if (content === this.#previousContent) return
 
-		if (animate && content.length > this.#previousContent.length && content.startsWith(this.#previousContent)) {
+		if (content.length > this.#previousContent.length && content.startsWith(this.#previousContent)) {
 			this.pendingChunks = [...this.pendingChunks, this.#createChunk(content.slice(this.#previousContent.length))]
 		} else {
 			this.stableContent = content
@@ -37,13 +27,11 @@ export class StreamingTextBuffer {
 		}
 
 		this.#previousContent = content
-		this.#previousAnimate = animate
-		return true
 	}
 
-	settle(id: number): boolean {
+	settle(id: number): void {
 		const chunkIndex = this.pendingChunks.findIndex((chunk) => chunk.id === id)
-		if (chunkIndex === -1 || this.pendingChunks[chunkIndex].settled) return false
+		if (chunkIndex === -1 || this.pendingChunks[chunkIndex].settled) return
 
 		const chunks = this.pendingChunks.map((chunk, index) =>
 			index === chunkIndex ? { ...chunk, settled: true } : chunk
@@ -60,8 +48,6 @@ export class StreamingTextBuffer {
 		} else {
 			this.pendingChunks = chunks
 		}
-
-		return true
 	}
 
 	#createChunk(content: string): StreamingTextChunk {
@@ -70,38 +56,5 @@ export class StreamingTextBuffer {
 			content,
 			settled: false
 		}
-	}
-}
-
-export class StreamingText {
-	stableContent = $state('')
-	pendingChunks = $state<StreamingTextChunk[]>([])
-
-	#buffer: StreamingTextBuffer
-
-	constructor(private readonly options: StreamingTextOptions) {
-		const content = untrack(this.options.getContent)
-		const animate = untrack(this.options.getAnimate)
-
-		this.#buffer = new StreamingTextBuffer(content, animate)
-		this.#sync()
-
-		$effect.pre(() => {
-			const nextContent = this.options.getContent()
-			const nextAnimate = this.options.getAnimate()
-
-			untrack(() => {
-				if (this.#buffer.update(nextContent, nextAnimate)) this.#sync()
-			})
-		})
-	}
-
-	settle(id: number): void {
-		if (this.#buffer.settle(id)) this.#sync()
-	}
-
-	#sync(): void {
-		this.stableContent = this.#buffer.stableContent
-		this.pendingChunks = this.#buffer.pendingChunks
 	}
 }

@@ -1,15 +1,14 @@
 import { render } from 'svelte/server'
 import { describe, expect, it } from 'vitest'
 import { parseMarkdown } from '../parser'
-import MarkdownStream from './markdown-stream.svelte'
-import { StreamingTextBuffer } from './streaming-text.svelte'
+import { MarkdownStream } from './index'
 
 describe('MarkdownStream', () => {
 	it('requires raw HTML rendering to be explicitly enabled', () => {
 		const nodes = parseMarkdown('<div>block</div>\n\nbefore <strong>inline</strong> after')
-		const escaped = render(MarkdownStream, { props: { nodes, animate: false } }).body
+		const escaped = render(MarkdownStream, { props: { nodes } }).body
 		const rendered = render(MarkdownStream, {
-			props: { nodes, animate: false, allowRawHtml: true }
+			props: { nodes, allowRawHtml: true }
 		}).body
 
 		expect(escaped).toContain('&lt;div>block&lt;/div>')
@@ -19,31 +18,20 @@ describe('MarkdownStream', () => {
 		expect(rendered).toContain('<strong>inline</strong>')
 	})
 
-	it('lets rapid text chunks finish independently before merging them in order', () => {
-		const stream = new StreamingTextBuffer('Hello', true)
-		stream.settle(stream.pendingChunks[0].id)
-		stream.update('Hello I am', true)
-		stream.update('Hello I am Steve', true)
+	it('renders parsed nodes with streaming animations', () => {
+		const nodes = parseMarkdown(
+			'> Quoted text\n\n- [x] Done\n\n```js\nconst value = 1\n```\n\n---\n\nText[^note].\n\n[^note]: Footnote.'
+		)
+		const body = render(MarkdownStream, {
+			props: { nodes, class: 'custom-document', 'aria-label': 'Stream' }
+		}).body
 
-		const [intro, name] = stream.pendingChunks
-		expect(stream.stableContent).toBe('Hello')
-		expect(stream.pendingChunks.map((chunk) => chunk.content)).toEqual([' I am', ' Steve'])
-
-		stream.settle(name.id)
-		expect(stream.stableContent).toBe('Hello')
-		expect(stream.pendingChunks).toEqual([intro, { ...name, settled: true }])
-
-		stream.settle(intro.id)
-		expect(stream.stableContent).toBe('Hello I am Steve')
-		expect(stream.pendingChunks).toEqual([])
-	})
-
-	it('flushes pending text animations when content is replaced', () => {
-		const stream = new StreamingTextBuffer('Hello', true)
-		stream.update('Hello there', true)
-		stream.update('Replacement', true)
-
-		expect(stream.stableContent).toBe('Replacement')
-		expect(stream.pendingChunks).toEqual([])
+		expect(body).toContain('data-markdown-svelte-stream=""')
+		expect(body).toContain('markdown-svelte-stream custom-document')
+		expect(body).toContain('aria-label="Stream"')
+		for (const name of ['block-enter', 'list-item', 'code-size', 'rule', 'footnote', 'delta']) {
+			expect(body).toContain(`markdown-svelte-stream-${name}`)
+		}
+		expect(body).toContain('height: calc(2rem + 1lh)')
 	})
 })

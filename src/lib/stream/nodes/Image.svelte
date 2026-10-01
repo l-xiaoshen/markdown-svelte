@@ -1,11 +1,11 @@
 <script lang="ts">
 	import type { ImageNode as ParserImageNode } from 'stream-markdown-parser'
-	import type { NodeProps } from '../../node-props'
-	import { useRenderContext } from '../../render-context'
-	import { safeImageSource } from '../../url-policy'
+	import type { NodeProps } from '../../render/node-props'
+	import { useDocumentContext } from '../../document/context'
+	import { safeImageSource } from '../../html/url-policy'
 
 	let { node }: NodeProps<ParserImageNode> = $props()
-	const context = useRenderContext()
+	const context = useDocumentContext()
 	let source = $derived(safeImageSource(node.src, context.baseUrl))
 	let loadedSource = $state<string>()
 </script>
@@ -17,7 +17,7 @@
 			class:markdown-svelte-stream-image--loaded={loadedSource === source}
 			src={source}
 			alt={node.alt}
-			title={node.title ?? undefined}
+			title={node.title}
 			loading="lazy"
 			decoding="async"
 			onload={() => (loadedSource = source)}

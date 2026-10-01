@@ -219,9 +219,10 @@ code {
 	margin: 1.25rem 0;
 	padding: 1rem 1.1rem;
 	overflow-x: auto;
-	border: 1px solid #d9dde3;
-	border-radius: 0.35rem;
-	background: #f7f8fa;
+	border: 0;
+	border-left: 2px solid #dce1d3;
+	border-radius: 0;
+	background: #f3f4ee;
 	color: #1f2937;
 	font-size: 0.82rem;
 	line-height: 1.65;

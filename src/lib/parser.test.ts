@@ -1,8 +1,7 @@
 import { getMarkdown, parseMarkdownToStructure } from 'stream-markdown-parser'
 import { render } from 'svelte/server'
 import { describe, expect, it } from 'vitest'
-import { parseMarkdown } from './parser'
-import MarkdownStream from './stream/markdown-stream.svelte'
+import { MarkdownRenderer, parseMarkdown } from './index'
 
 function createStream() {
 	const parser = getMarkdown('parser-regression-test')
@@ -41,8 +40,8 @@ describe('stream-markdown-parser integration', () => {
 		const source = '# Guide\n\nRead [the API][api].\n\nAnother paragraph.\n\n'
 		const partial = stream.parse(source)
 		const resolved = stream.parse(`${source}[api]: https://example.com/docs\n`)
-		const partialBody = render(MarkdownStream, { props: { nodes: partial, animate: false } }).body
-		const resolvedBody = render(MarkdownStream, { props: { nodes: resolved, animate: false } }).body
+		const partialBody = render(MarkdownRenderer, { props: { nodes: partial } }).body
+		const resolvedBody = render(MarkdownRenderer, { props: { nodes: resolved } }).body
 
 		expect(partialBody).toContain('Read [the API][api].')
 		expect(partialBody).not.toContain('href="https://example.com/docs"')
@@ -57,9 +56,9 @@ describe('stream-markdown-parser integration', () => {
 		const appended = stream.parse(source)
 		const finalized = stream.parse(source, true)
 
-		expect(render(MarkdownStream, { props: { nodes: partial, animate: false } }).body).not.toContain('<a ')
+		expect(render(MarkdownRenderer, { props: { nodes: partial } }).body).not.toContain('<a ')
 		for (const nodes of [appended, finalized]) {
-			const body = render(MarkdownStream, { props: { nodes, animate: false } }).body
+			const body = render(MarkdownRenderer, { props: { nodes } }).body
 
 			expect(body.match(/href="http:\/\/example\.com"/g)).toHaveLength(1)
 			expect(body.match(/href="mailto:support@example\.com"/g)).toHaveLength(1)
@@ -80,8 +79,8 @@ describe('stream-markdown-parser integration', () => {
 
 		for (const source of chunks) {
 			const nodes = stream.parse(source)
-			const body = render(MarkdownStream, {
-				props: { nodes, animate: false, allowRawHtml: true }
+			const body = render(MarkdownRenderer, {
+				props: { nodes, allowRawHtml: true }
 			}).body
 
 			expect(body.match(/First summary/g)).toHaveLength(1)
@@ -109,7 +108,7 @@ describe('stream-markdown-parser integration', () => {
 			}
 		])
 		const renderBody = (nodes: ReturnType<typeof parseMarkdown>) =>
-			render(MarkdownStream, { props: { nodes, animate: false, allowRawHtml: true } }).body.replace(/<!--.*?-->/g, '')
+			render(MarkdownRenderer, { props: { nodes, allowRawHtml: true } }).body.replace(/<!--.*?-->/g, '')
 		const finalizedBody = renderBody(finalized)
 
 		expect(finalizedBody).toBe(renderBody(parseMarkdown(source)))
@@ -124,11 +123,9 @@ describe('stream-markdown-parser integration', () => {
 		const oldDocument = stream.parse(`${source}[api]: https://example.com/old\n`)
 		stream.reset()
 		const newDocument = stream.parse(`${source}New document`)
-		const body = render(MarkdownStream, { props: { nodes: newDocument, animate: false } }).body
+		const body = render(MarkdownRenderer, { props: { nodes: newDocument } }).body
 
-		expect(render(MarkdownStream, { props: { nodes: oldDocument, animate: false } }).body).toContain(
-			'href="https://example.com/old"'
-		)
+		expect(render(MarkdownRenderer, { props: { nodes: oldDocument } }).body).toContain('href="https://example.com/old"')
 		expect(body).toContain('Read [the API][api].')
 		expect(body).toContain('New document')
 		expect(body).not.toContain('href="https://example.com/old"')
@@ -143,11 +140,9 @@ describe('parseMarkdown', () => {
 		const undefinedReference = parseMarkdown(source)
 		const redefined = parseMarkdown(`${source}\n\n[api]: https://example.com/second`)
 
-		expect(render(MarkdownStream, { props: { nodes: defined, animate: false } }).body).toContain(
-			'href="https://example.com/first"'
-		)
+		expect(render(MarkdownRenderer, { props: { nodes: defined } }).body).toContain('href="https://example.com/first"')
 		expect(undefinedReference).toMatchObject([{ type: 'paragraph', children: [{ type: 'text', content: source }] }])
-		const body = render(MarkdownStream, { props: { nodes: redefined, animate: false } }).body
+		const body = render(MarkdownRenderer, { props: { nodes: redefined } }).body
 		expect(body).toContain('href="https://example.com/second"')
 		expect(body).not.toContain('https://example.com/first')
 	})

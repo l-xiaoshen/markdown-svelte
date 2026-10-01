@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Seo from '../_components/Seo.svelte'
 	import usageExample from './_examples/Usage.svelte?raw'
+	import rendererExample from './_examples/Renderer.svelte?raw'
 	import workerExample from './_examples/markdown.worker.ts?raw'
 	import streamExample from './_examples/Stream.svelte?raw'
 	import optionsExample from './_examples/Options.svelte?raw'
@@ -64,10 +65,25 @@
 	</p>
 </section>
 
+<section class="page-section" id="parsed-nodes">
+	<h2>Parsed nodes</h2>
+	<p>
+		Use <code>MarkdownRenderer</code> to render a parsed node array without animation. Replace <code>nodes</code> as the document
+		changes, including when new nodes arrive from a worker.
+	</p>
+	<pre class="code-block"><code>{rendererExample.trim()}</code></pre>
+	<p>
+		<code>MarkdownRenderer</code> and <code>MarkdownStream</code> accept <code>nodes</code> and the same document
+		options as <code>MarkdownViewer</code>: <code>baseUrl</code>, <code>idPrefix</code>, <code>allowRawHtml</code>, and
+		article attributes.
+	</p>
+</section>
+
 <section class="page-section" id="streaming">
 	<h2>Streaming</h2>
 	<p>
-		For streaming, use <code>MarkdownStream</code> with a worker to keep parsing off the main thread.
+		Use <code>MarkdownStream</code> to animate incoming node updates, with a worker to keep parsing off the main thread.
+		For updates without animation, use <code>MarkdownRenderer</code> with the same <code>nodes</code> array.
 	</p>
 	<pre class="code-block"><code>npm install stream-markdown-parser</code></pre>
 	<p>Save these two files together in a Vite / SvelteKit app.</p>
@@ -163,13 +179,6 @@
 	.file-label {
 		color: #6d7461;
 		font-size: 0.85rem;
-	}
-
-	.code-block {
-		border: 0;
-		border-left: 2px solid #dce1d3;
-		border-radius: 0;
-		background: #f3f4ee;
 	}
 
 	.api-table {

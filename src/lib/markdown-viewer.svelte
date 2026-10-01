@@ -1,6 +1,6 @@
 <script lang="ts">
 	import MarkdownRenderer from './markdown-renderer.svelte'
-	import type { MarkdownViewerProps } from './markdown-viewer-props'
+	import type { MarkdownViewerProps } from './markdown-props'
 	import { parseMarkdown } from './parser'
 
 	let { markdown, ...props }: MarkdownViewerProps = $props()

@@ -40,7 +40,7 @@
 			title: 'Document',
 			note: 'The class prop is added to the root article. Scope overrides to that class when a page has several documents.',
 			hooks: [
-				['.markdown-svelte', 'Root article for both renderers; also has [data-markdown-svelte].'],
+				['.markdown-svelte', 'Root article for all renderers; also has [data-markdown-svelte].'],
 				['.markdown-svelte-stream', 'Additional root class for MarkdownStream; also has [data-markdown-svelte-stream].']
 			],
 			css: documentCss
@@ -238,7 +238,7 @@
 	<h1>Styling</h1>
 	<p>
 		Set theme variables for a whole document, or target individual elements with CSS.
-		<code>MarkdownViewer</code> and <code>MarkdownStream</code> share the same element classes.
+		<code>MarkdownViewer</code>, <code>MarkdownRenderer</code>, and <code>MarkdownStream</code> share the same element classes.
 	</p>
 </header>
 
@@ -319,7 +319,8 @@
 	<h2>Streaming motion</h2>
 	<p>
 		Set these variables on your <code>MarkdownStream</code> class to adjust animation timing. Motion respects
-		<code>prefers-reduced-motion</code>. To turn it off, pass <code>{'animate={false}'}</code> to the component.
+		<code>prefers-reduced-motion</code>. For rendering without animation, use <code>MarkdownRenderer</code> from
+		<code>markdown-svelte</code> with the same <code>nodes</code> array.
 	</p>
 	<pre class="code-block"><code>{motionExample.trimEnd()}</code></pre>
 	<div class="table-scroll">
@@ -392,13 +393,6 @@
 
 	section {
 		scroll-margin-top: 2rem;
-	}
-
-	.code-block {
-		border: 0;
-		border-left: 2px solid #dce1d3;
-		border-radius: 0;
-		background: #f3f4ee;
 	}
 
 	.reference-table {

@@ -1,13 +1,14 @@
 <script lang="ts">
-	import { useRenderContext } from '../../render-context'
+	import { untrack } from 'svelte'
 	import { StreamingText } from '../streaming-text.svelte'
 	import Delta from './Delta.svelte'
 
 	let { content }: { content: string } = $props()
-	const context = useRenderContext()
-	const stream = new StreamingText({
-		getContent: () => content,
-		getAnimate: () => context.animate === true
+	const stream = new StreamingText(untrack(() => content))
+
+	$effect.pre(() => {
+		const nextContent = content
+		untrack(() => stream.update(nextContent))
 	})
 </script>
 

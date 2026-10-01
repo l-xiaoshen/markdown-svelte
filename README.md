@@ -22,8 +22,12 @@ Requires `svelte ^5.57.1`.
 <MarkdownViewer markdown="# Hello, **Svelte**!" />
 ```
 
-For streaming, use `MarkdownStream` from `markdown-svelte/stream` with the
-[worker example](https://markdown-svelte.pages.dev/docs/#streaming).
+For parsed node arrays, use `MarkdownRenderer` from `markdown-svelte`. It accepts
+`nodes` and renders updates without animation.
+
+Use `MarkdownStream` from `markdown-svelte/stream` to animate incoming node updates.
+Both components accept the same props. See the
+[worker example](https://markdown-svelte.pages.dev/docs/#streaming) for incremental parsing.
 
 Customize the appearance with CSS variables and element classes. See the
 [styling guide](https://markdown-svelte.pages.dev/docs/styling/).

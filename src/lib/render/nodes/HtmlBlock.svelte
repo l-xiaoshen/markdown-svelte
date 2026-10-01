@@ -1,0 +1,22 @@
+<script lang="ts">
+	import type { HtmlBlockNode as ParserHtmlBlockNode } from 'stream-markdown-parser'
+	import { canRenderHtmlTagAtRoot } from '../../html/elements'
+	import { safeHtml } from '../../html/policy'
+	import type { NodeProps } from '../node-props'
+	import { useDocumentContext } from '../../document/context'
+
+	let { node }: NodeProps<ParserHtmlBlockNode> = $props()
+	const context = useDocumentContext()
+</script>
+
+{#if context.allowRawHtml && canRenderHtmlTagAtRoot(node.tag)}
+	<div class="markdown-svelte-html-block">{@html safeHtml(node.content)}</div>
+{:else}
+	<span class="markdown-svelte-html-escaped">{node.raw}</span>
+{/if}
+
+<style>
+	:where(.markdown-svelte-html-block) {
+		display: contents;
+	}
+</style>
