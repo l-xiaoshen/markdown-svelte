@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.1.0
+
+- Add `MarkdownRenderer` and `MarkdownRendererProps` to the main entrypoint for rendering parsed
+  node arrays without animation.
+- **Breaking:** Remove the `animate` prop from `MarkdownStream`. Replace
+  `<MarkdownStream animate={false} ... />` with `<MarkdownRenderer ... />`. `MarkdownStream`
+  uses the animated renderers and continues to respect reduced-motion preferences.
+- **Breaking:** Remove the default export from `markdown-svelte/stream`. Use
+  `import { MarkdownStream } from 'markdown-svelte/stream'`.
+- **Breaking:** Remove `MarkdownStreamProps` and the `ParsedMarkdownNode` re-export from the
+  streaming entrypoint. Import `MarkdownRendererProps` and `ParsedMarkdownNode` from
+  `markdown-svelte` instead; both node renderers accept `MarkdownRendererProps`.
+- Replace conditional node dispatch with typed renderer maps and separate document and rendering
+  contexts. Consolidate duplicate components, props, streaming state, markup, and CSS.
+- Group library internals into document, rendering, and HTML folders; colocate playground code
+  and examples, and remove the duplicate `/stream/` playground route.
+- Remove legacy package metadata and redundant tooling configuration. Package resolution uses
+  the existing `exports` map.
+- Add regression coverage for renderer modes, split diff panes, streaming text updates, and
+  footnote targets and backlinks.
+
 ## 0.0.5
 
 - Doc update.
