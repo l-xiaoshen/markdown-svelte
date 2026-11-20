@@ -13,8 +13,9 @@
 		class="markdown-svelte-footnote-backlink"
 		href={`#${target}`}
 		aria-label={`Back to footnote reference ${node.id}${targets.length > 1 ? `, occurrence ${index + 1}` : ''}`}
-		>&crarr;{#if targets.length > 1}<sup>{index + 1}</sup>{/if}</a
 	>
+		&crarr;{#if targets.length > 1}<sup>{index + 1}</sup>{/if}
+	</a>
 {/each}
 
 <style>

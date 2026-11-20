@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { MarkdownViewer } from '$lib/index'
+	import { MarkdownViewer } from '#lib'
 	import Seo from '../_components/Seo.svelte'
 	import basicMarkdown from './_examples/basic.md?raw'
 	import extendedMarkdown from './_examples/extended.md?raw'

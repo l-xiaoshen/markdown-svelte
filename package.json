@@ -1,9 +1,9 @@
 {
 	"name": "markdown-svelte",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "A secure, typed Markdown renderer for Svelte 5.",
 	"license": "MIT",
-	"packageManager": "bun@1.4.2",
+	"packageManager": "bun@1.4.5",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && bun run prepack",
@@ -29,6 +29,10 @@
 		"**/*.css"
 	],
 	"type": "module",
+	"imports": {
+		"#lib": "./src/lib/index.ts",
+		"#lib/stream": "./src/lib/stream/index.ts"
+	},
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
@@ -43,19 +47,19 @@
 		"svelte": "^5.57.1"
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-static": "^3.0.10",
-		"@sveltejs/kit": "^2.70.3",
-		"@sveltejs/package": "^2.5.8",
+		"@sveltejs/adapter-static": "^4.0.1",
+		"@sveltejs/kit": "^3.4.0",
+		"@sveltejs/package": "^3.0.3",
 		"@sveltejs/vite-plugin-svelte": "^7.3.1",
 		"@typescript/native": "npm:typescript@^7.0.2",
-		"prettier": "^3.9.9",
-		"prettier-plugin-svelte": "^4.1.1",
-		"publint": "^0.3.24",
-		"svelte": "^5.57.1",
-		"svelte-check": "^4.7.6",
+		"prettier": "^3.10.1",
+		"prettier-plugin-svelte": "^4.2.0",
+		"publint": "^0.3.25",
+		"svelte": "^5.58.0",
+		"svelte-check": "^4.7.8",
 		"typescript": "~6.0.3",
-		"vite": "^8.3.1",
-		"vitest": "^5.0.2"
+		"vite": "^8.3.8",
+		"vitest": "^5.1.1"
 	},
 	"keywords": [
 		"svelte",
@@ -64,6 +68,6 @@
 		"svelte-component"
 	],
 	"dependencies": {
-		"stream-markdown-parser": "^1.2.17"
+		"stream-markdown-parser": "^1.2.28"
 	}
 }

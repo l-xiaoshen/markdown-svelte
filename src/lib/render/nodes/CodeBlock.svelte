@@ -51,9 +51,9 @@
 <div class="markdown-svelte-code-block">
 	<div class="markdown-svelte-code-header">
 		{#key context.animate ? languageLabel : 'static'}
-			<span class="markdown-svelte-code-language" class:markdown-svelte-stream-code-language={context.animate}
-				>{languageLabel}</span
-			>
+			<span class="markdown-svelte-code-language" class:markdown-svelte-stream-code-language={context.animate}>
+				{languageLabel}
+			</span>
 		{/key}
 		<button
 			class="markdown-svelte-code-copy"

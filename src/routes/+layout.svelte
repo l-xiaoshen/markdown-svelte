@@ -8,11 +8,13 @@
 <div class="site-shell">
 	<header class="site-header">
 		<div class="site-header-inner">
-			<a class="site-brand" href="/" aria-label="markdown-svelte playground"
-				><img class="brand-mark" src="/markdown-svelte-icon.svg" width="32" height="32" alt="" />markdown<span
-					class="brand-svelte">-svelte</span
-				></a
-			>
+			<a class="site-brand" href="/" aria-label="markdown-svelte playground">
+				<img class="brand-mark" src="/markdown-svelte-icon.svg" width="32" height="32" alt="" />markdown<span
+					class="brand-svelte"
+				>
+					-svelte
+				</span>
+			</a>
 			<nav class="site-nav" aria-label="Main navigation">
 				<a href="/" aria-current={page.url.pathname === '/' ? 'page' : undefined}>Playground</a>
 				<a href="/docs/" aria-current={page.url.pathname.startsWith('/docs/') ? 'page' : undefined}>Docs</a>

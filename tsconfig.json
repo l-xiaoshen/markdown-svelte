@@ -1,12 +1,13 @@
 {
-	"extends": "./.svelte-kit/tsconfig.json",
+	"extends": "$app/tsconfig",
+	"include": ["src", "vite.config.ts"],
 	"compilerOptions": {
+		// Type-check the documentation examples against source before packaging.
+		"paths": {
+			"markdown-svelte": ["./src/lib/index.ts"],
+			"markdown-svelte/stream": ["./src/lib/stream/index.ts"]
+		},
 		"rewriteRelativeImportExtensions": true,
-		"allowJs": true,
-		"checkJs": true,
-		"forceConsistentCasingInFileNames": true,
-		"resolveJsonModule": true,
-		"skipLibCheck": true,
 		"sourceMap": true,
 		"declaration": true,
 		"declarationMap": true,

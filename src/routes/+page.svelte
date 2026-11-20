@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { PUBLIC_BASE_URL } from '$env/static/public'
+	import { PUBLIC_BASE_URL } from '$app/env/public'
 	import Playground from './_playground/Playground.svelte'
 	import Seo from './_components/Seo.svelte'
 

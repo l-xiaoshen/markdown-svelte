@@ -1,5 +1,5 @@
 import { getMarkdown, parseMarkdownToStructure } from 'stream-markdown-parser'
-import type { ParsedMarkdownNode } from '$lib'
+import type { ParsedMarkdownNode } from '#lib'
 
 export interface ParseRequest {
 	version: number

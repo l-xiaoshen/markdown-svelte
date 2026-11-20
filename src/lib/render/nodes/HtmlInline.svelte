@@ -20,8 +20,9 @@
 	<svelte:element
 		this={isBlock ? 'div' : 'span'}
 		class={isBlock ? 'markdown-svelte-html-block' : 'markdown-svelte-html-inline'}
-		>{@html safeHtml(node.content)}</svelte:element
 	>
+		{@html safeHtml(node.content)}
+	</svelte:element>
 {:else}
 	<span class="markdown-svelte-html-escaped">{node.raw}</span>
 {/if}

@@ -147,9 +147,9 @@
 <section class="page-section" id="styling">
 	<h2>Styling</h2>
 	<p>
-		No global package stylesheet is required. Set CSS custom properties on the component class for theme changes. Stable <code
-			>markdown-svelte-*</code
-		> classes are available for element-level overrides.
+		No global package stylesheet is required. Set CSS custom properties on the component class for theme changes. Stable <code>
+			markdown-svelte-*
+		</code> classes are available for element-level overrides.
 	</p>
 	<pre class="code-block"><code>{stylingExample.trim()}</code></pre>
 	<p>

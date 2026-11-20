@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
-	import { MarkdownRenderer, type ParsedMarkdownNode } from '$lib'
-	import { MarkdownStream } from '$lib/stream'
+	import { MarkdownRenderer, type ParsedMarkdownNode } from '#lib'
+	import { MarkdownStream } from '#lib/stream'
 	import { createFrameParser } from './frame-parser'
 	import Icon from '../_components/Icon.svelte'
 	import { playgroundExamples } from './playground-examples'
@@ -275,19 +275,23 @@
 					<button
 						class:active={example.id === item.id && !modified}
 						aria-pressed={example.id === item.id && !modified}
-						onclick={() => chooseExample(item)}>{item.label}</button
+						onclick={() => chooseExample(item)}
 					>
+						{item.label}
+					</button>
 				{/each}
 			</div>
 			<div class="mode-picker" role="group" aria-label="Rendering mode">
-				<button class:active={mode === 'stream'} aria-pressed={mode === 'stream'} onclick={() => changeMode('stream')}
-					><Icon name="wave" size={14} /> Streaming</button
-				>
+				<button class:active={mode === 'stream'} aria-pressed={mode === 'stream'} onclick={() => changeMode('stream')}>
+					<Icon name="wave" size={14} /> Streaming
+				</button>
 				<button
 					class:active={mode === 'instant'}
 					aria-pressed={mode === 'instant'}
-					onclick={() => changeMode('instant')}><Icon name="eye" size={14} /> Instant preview</button
+					onclick={() => changeMode('instant')}
 				>
+					<Icon name="eye" size={14} /> Instant preview
+				</button>
 			</div>
 		</div>
 
@@ -295,13 +299,17 @@
 			<button
 				class:active={mobilePanel === 'preview'}
 				aria-pressed={mobilePanel === 'preview'}
-				onclick={() => (mobilePanel = 'preview')}><Icon name="eye" /> Preview</button
+				onclick={() => (mobilePanel = 'preview')}
 			>
+				<Icon name="eye" /> Preview
+			</button>
 			<button
 				class:active={mobilePanel === 'source'}
 				aria-pressed={mobilePanel === 'source'}
-				onclick={() => (mobilePanel = 'source')}><Icon name="code" /> Edit source</button
+				onclick={() => (mobilePanel = 'source')}
 			>
+				<Icon name="code" /> Edit source
+			</button>
 		</div>
 
 		<div class="editor-grid" data-mobile-panel={mobilePanel}>
@@ -313,8 +321,9 @@
 						<span class="file-name">{modified ? 'your-markdown.md' : example.filename}</span>
 					</div>
 					<div class="source-actions">
-						{#if modified}<button class="text-button" onclick={() => chooseExample(example)}>Restore example</button
-							>{/if}
+						{#if modified}<button class="text-button" onclick={() => chooseExample(example)}>
+								Restore example
+							</button>{/if}
 						<button
 							class="icon-button"
 							onclick={copySource}
@@ -327,8 +336,10 @@
 								? 'Copied'
 								: copied === 'failed'
 									? 'Copy failed — select and copy the source'
-									: 'Copy Markdown'}><Icon name={copied === 'copied' ? 'check' : 'copy'} /></button
+									: 'Copy Markdown'}
 						>
+							<Icon name={copied === 'copied' ? 'check' : 'copy'} />
+						</button>
 					</div>
 				</header>
 				<div class="source-editor">
@@ -357,9 +368,9 @@
 						<Icon name="eye" />
 						<h2 id="preview-title">Preview</h2>
 					</div>
-					{#if mode === 'stream'}<label class="follow-control"
-							><input type="checkbox" bind:checked={followOutput} /> Follow stream</label
-						>{/if}
+					{#if mode === 'stream'}<label class="follow-control">
+							<input type="checkbox" bind:checked={followOutput} /> Follow stream
+						</label>{/if}
 				</header>
 				<!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions (The scrolling preview supports keyboard navigation.) -->
 				<div
@@ -399,41 +410,45 @@
 					{/if}
 				</div>
 				<footer class="panel-footer">
-					<span role="status" class:streaming={running && mode === 'stream'}>{status}</span><span
-						>{mode === 'stream' ? `${cursor} / ${markdown.length}` : markdown.length} characters</span
-					>
+					<span role="status" class:streaming={running && mode === 'stream'}>{status}</span><span>
+						{mode === 'stream' ? `${cursor} / ${markdown.length}` : markdown.length} characters
+					</span>
 				</footer>
 			</section>
 		</div>
 
 		<div class="playback-bar">
 			<div class="playback-actions">
-				<button class="primary-button" onclick={togglePlayback} disabled={!markdown}
-					><Icon name={mode === 'instant' || complete ? 'replay' : running ? 'pause' : 'play'} />{mode === 'instant'
+				<button class="primary-button" onclick={togglePlayback} disabled={!markdown}>
+					<Icon name={mode === 'instant' || complete ? 'replay' : running ? 'pause' : 'play'} />{mode === 'instant'
 						? 'Stream this'
 						: complete
 							? 'Replay'
 							: running
 								? 'Pause'
-								: 'Resume'}</button
-				>
+								: 'Resume'}
+				</button>
 				<button
 					class="icon-button"
 					onclick={replay}
 					disabled={!markdown}
 					aria-label="Replay from the beginning"
-					title="Replay from the beginning"><Icon name="replay" /></button
+					title="Replay from the beginning"
 				>
+					<Icon name="replay" />
+				</button>
 				<button
 					class="icon-button"
 					onclick={finish}
 					disabled={complete || mode === 'instant' || !markdown}
 					aria-label="Show complete Markdown"
-					title="Show complete Markdown"><Icon name="skip" /></button
+					title="Show complete Markdown"
 				>
+					<Icon name="skip" />
+				</button>
 			</div>
-			<label class="progress-control"
-				><span class="sr-only">Stream progress</span><input
+			<label class="progress-control">
+				<span class="sr-only">Stream progress</span><input
 					type="range"
 					min="0"
 					max={markdown.length || 1}
@@ -443,36 +458,37 @@
 					style:--progress={`${displayedProgress}%`}
 					disabled={mode === 'instant' || !markdown}
 					oninput={seek}
-				/><span class="progress-value" aria-hidden="true">{displayedProgress}%</span></label
-			>
+				/><span class="progress-value" aria-hidden="true">{displayedProgress}%</span>
+			</label>
 			<div class="playback-options">
-				<label class="speed-control"
-					>Speed<select bind:value={speed} aria-label="Streaming speed"
-						><option value={0.5}>0.5×</option><option value={1}>1×</option><option value={2}>2×</option></select
-					></label
-				>
+				<label class="speed-control">
+					Speed<select bind:value={speed} aria-label="Streaming speed">
+						<option value={0.5}>0.5×</option><option value={1}>1×</option><option value={2}>2×</option>
+					</select>
+				</label>
 				<label
 					class="motion-control"
 					title={reducedMotion
 						? 'Reduced motion is enabled in your system settings'
 						: 'Fade new content in as it arrives'}
-					><input type="checkbox" role="switch" bind:checked={animate} disabled={reducedMotion} /><span
+				>
+					<input type="checkbox" role="switch" bind:checked={animate} disabled={reducedMotion} /><span
 						class="switch-track"
 						aria-hidden="true"
-					></span>Fade in</label
-				>
+					></span>Fade in
+				</label>
 			</div>
 		</div>
 	</section>
 
 	<div class="playground-note">
-		<span
-			>{mode === 'instant'
+		<span>
+			{mode === 'instant'
 				? 'Select Stream this to replay your changes.'
 				: reducedMotion
 					? 'Reduced motion is enabled. Select Replay to start streaming.'
-					: 'Scroll up to stop following the stream.'}</span
-		><a href="/docs/#streaming">Streaming API <Icon name="arrow" size={14} /></a>
+					: 'Scroll up to stop following the stream.'}
+		</span><a href="/docs/#streaming">Streaming API <Icon name="arrow" size={14} /></a>
 	</div>
 
 	<section class="quick-start" aria-label="Usage">
